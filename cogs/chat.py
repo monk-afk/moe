@@ -33,23 +33,12 @@ class ChatCog(commands.Cog):
                 async with message.channel.typing():
                     user_input = message.content
                     new_user_input_ids = self.tokenizer.encode(user_input + self.tokenizer.eos_token, return_tensors='pt')
-                    bot_input_ids = torch.cat([self.chat_history_ids, new_user_input_ids], dim=-1) if self.chat_history_ids is not None else new_user_input_ids
-
-                    attention_mask = torch.ones_like(bot_input_ids)
-                    self.chat_history_ids = self.model.generate(
-                        bot_input_ids,
-                        max_length=1000,
-                        pad_token_id=self.tokenizer.eos_token_id,
-                        attention_mask=attention_mask,
-                        do_sample=True,
-                        top_k=50,
-                        top_p=0.9,
-                        temperature=0.7
-                    )
+                    bot_input_ids = torch.cat([self.chat_history_ids, new_user_input_ids], dim = -1) if self.chat_history_ids is not None else new_user_input_ids
 
                     flat_token_ids = bot_input_ids.flatten().tolist()
                     messages = []
                     current_message = []
+
                     for token_id in flat_token_ids:
                         if token_id == 50256:
                             if current_message:
@@ -57,12 +46,30 @@ class ChatCog(commands.Cog):
                                 current_message = []
                         else:
                             current_message.append(token_id)
+
                     if current_message:
                         messages.append(current_message)
 
-                    last_5_messages = messages[5:]
-                    flattened_last_5_with_delimiters = [token for message in last_5_messages for token in message + [50256]]
-                    result_tensor = torch.tensor([flattened_last_5_with_delimiters])
+                    if len(messages) > 5:
+                        last_5_messages = messages[5:]
+                        flattened_last_5_with_delimiters = [token for message in last_5_messages for token in message + [50256]]
+                        result_tensor = torch.tensor([flattened_last_5_with_delimiters])
+                        bot_input_ids = result_tensor
+                    else:
+                        last_5_messages = []
+
+                    attention_mask = torch.ones_like(bot_input_ids)
+                    self.chat_history_ids = self.model.generate(
+                        bot_input_ids,
+                        max_length = 1000,
+                        pad_token_id = self.tokenizer.eos_token_id,
+                        attention_mask = attention_mask,
+                        do_sample = True,
+                        top_k = 50,
+                        top_p = 0.9,
+                        temperature = 0.7
+                    )
+
                     response = self.tokenizer.decode(self.chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
                     await message.channel.send(response)
             finally:
