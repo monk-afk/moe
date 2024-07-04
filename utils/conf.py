@@ -9,7 +9,7 @@ pgsql_db = os.getenv('PGSQL_DB')
 class Config:
     def __init__(self):
         self.discord_token = os.getenv('AUTH_TOKEN')
-        self.discord_prefix = 'm1'
+        self.discord_prefix = 'm1 '
         self.discord_intents = self.get_discord_intents()
 
     @staticmethod
@@ -19,7 +19,6 @@ class Config:
             'members': True,
             'messages': True,
             'reactions': True,
-            'presences': True,
             'message_content': True,
         }
 

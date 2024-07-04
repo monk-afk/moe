@@ -24,7 +24,7 @@ We may use non-personal information collected from users to:
 - Monitor the usage of the Chatbot for technical purposes.
 - Provide technical support and respond to user inquiries.
 
-Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) messages are stored per channel, reply channel, or direct message, at any given moment.
+Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) messages are stored per channel, reply channel, or direct message.
 
 You may request deletion of these messages by using the commands included with the Chatbot, which can be found using the Chatbot's help command.
 

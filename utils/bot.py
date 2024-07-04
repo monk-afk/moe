@@ -26,11 +26,7 @@ class moeBot(commands.Bot):
                     print(f'Loaded cog: {cog_name}')
                 except Exception as e:
                     print(f'Failed to load cog {cog_name}: {str(e)}')
-
         print(f'Bot is ready. Logged in as {self.user.name}')
-        channel = self.get_channel(self.config.reply_channel)
-        if channel:
-            await channel.send("I'm back online.")
 
     async def on_message(self, message):
         if message.author.bot:

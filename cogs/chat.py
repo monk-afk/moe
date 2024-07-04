@@ -1,9 +1,15 @@
+# cogs/chat.py
 import discord
 import re
 from discord.ext import commands
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
 from utils.conf import config
+from utils.pgsql import (
+    get_reply_channel,
+    get_channel_input_ids,
+    set_channel_input_ids,
+)
 
 patterns = {
     "moe": r".*\bmoe\b.*",
@@ -16,32 +22,37 @@ class ChatCog(commands.Cog):
         self.model_name = "microsoft/DialoGPT-large"
         self.tokenizer = GPT2Tokenizer.from_pretrained(self.model_name)
         self.model = GPT2LMHeadModel.from_pretrained(self.model_name)
-        self.chat_history_ids = None
-        self.is_processing = False
+        self.processing_channel = {}
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author == self.bot.user or message.author.bot:
             return
 
-        if self.is_processing:
+        if message.content.startswith(self.bot.command_prefix):
             return
 
-        if message.channel.id == config.reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()):
-            self.is_processing = True
+        channel_id = message.channel.id
+        if self.processing_channel.get(channel_id, False):
+            return
+
+        guild_id = message.guild.id
+        reply_channel = get_reply_channel(guild_id)
+
+        if channel_id == reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()):
             try:
                 async with message.channel.typing():
-                    user_input = message.content
-                    new_user_input_ids = self.tokenizer.encode(user_input + self.tokenizer.eos_token, return_tensors='pt')
-                    bot_input_ids = torch.cat([self.chat_history_ids, new_user_input_ids], dim = -1) if self.chat_history_ids is not None else new_user_input_ids
+                    self.processing_channel[channel_id] = True
+                    chat_history_ids = get_channel_input_ids(channel_id)
+                    new_user_input_ids = self.tokenizer.encode(message.content + self.tokenizer.eos_token, return_tensors='pt')
+                    bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if len(chat_history_ids) > 0 else new_user_input_ids
 
                     flat_token_ids = bot_input_ids.flatten().tolist()
-
                     messages = []
                     current_message = []
 
                     for token_id in flat_token_ids:
-                        if token_id == 50256:
+                        if token_id == self.tokenizer.eos_token_id:
                             if current_message:
                                 messages.append(current_message)
                                 current_message = []
@@ -50,31 +61,32 @@ class ChatCog(commands.Cog):
                     if current_message:
                         messages.append(current_message)
 
-                    if len(messages) > 10:
-                        last_10_messages = messages[10:]
-                        flattened_last_10_with_delimiters = [token for message in last_10_messages for token in message + [50256]]
+                    if len(messages) > 9:
+                        last_10_messages = messages[9:]
+                        flattened_last_10_with_delimiters = [token for message in last_10_messages for token in message + [self.tokenizer.eos_token_id]]
                         result_tensor = torch.tensor([flattened_last_10_with_delimiters])
                         bot_input_ids = result_tensor
-                        print(f"Last 10 messages: {last_10_messages}")
-                    else:
-                        last_10_messages = []
 
                     attention_mask = torch.ones_like(bot_input_ids)
-                    self.chat_history_ids = self.model.generate(
+                    chat_history_ids = self.model.generate(
                         bot_input_ids,
+                        min_length = 10,
                         max_length = 1000,
                         pad_token_id = self.tokenizer.eos_token_id,
                         attention_mask = attention_mask,
                         do_sample = True,
                         top_k = 50,
                         top_p = 0.9,
-                        temperature = 0.6
+                        temperature = 0.5,
+                        repetition_penalty = 1.0
                     )
 
-                    response = self.tokenizer.decode(self.chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+                    set_channel_input_ids(guild_id, channel_id, bot_input_ids.flatten().tolist())
+
+                    response = self.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
                     await message.channel.send(response)
             finally:
-                self.is_processing = False
+                self.processing_channel[channel_id] = False
 
 async def setup(bot):
     await bot.add_cog(ChatCog(bot))

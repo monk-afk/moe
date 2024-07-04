@@ -1,0 +1,9 @@
+# Example of required .env file
+# 
+# PRODUCTION
+AUTH_TOKEN=YOUR.DISCORD.AUTH.TOKEN
+PGSQL_DB=postgresql://db_user@localhost/bot_db
+# 
+# TESTING
+# AUTH_TOKEN=A.TEST.BOT.AUTH.TOKEN
+# PGSQL_DB=postgresql://db_user@localhost/test_db
