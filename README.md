@@ -6,7 +6,8 @@ A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored 
 
 ### &nbsp;&nbsp;&nbsp;[![](https://dcbadge.limes.pink/api/server/pE4Tu3cf23)](https://discord.gg/pE4Tu3cf23)
 
-This Readme needs more attention. I'll get to it eventually
+This Readme is incomplete and may contain errors.
+
 ___
 
 - > Keyword Trigger
@@ -18,87 +19,28 @@ ___
 
 ___
 
-## Required Software, Modules and Libraries
+## Installation
 
-```bash
-# Install and Setup PostgreSQL
-sudo apt install gnupg2
-wget http://deb.debian.org/debian/pool/main/p/postgresql-common/postgresql-common_225+deb11u1.tar.xz
-tar -xf postgresql-common_225\+deb11u1.tar.xz
-rm postgresql-common_225\+deb11u1.tar.xz
-sudo mkdir -p /usr/share/postgresql-common/pgdg
-sudo mv ./postgresql-common/pgdg/apt.postgresql.org.sh /usr/share/postgresql-common/pgdg/
-rm -r ./postgresql-common
-sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-sudo apt install postgresql-15 postgresql-server-dev-15
+- See docs/install.sh for steps to install
 
-# postgres is installed, do setup
-echo "Set new password for Unix user postgres"
-sudo passwd postgres
-PGSQL_MAIN_USER='moebot'
-PGSQL_MAIN_PWD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 48)
-PGSQL_MAIN_DB='moebot_db'
-PGSQL_TEST_USER=test_"$PGSQL_MAIN_USER"
-PGSQL_TEST_PWD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 48)
-PGSQL_TEST_DB=test_"$PGSQL_MAIN_DB"
+- PostgreSQL database.
+- Python3 (tested with 3.11)
+- python3-venv for virtual environment
+- python3-pip for additional libraries and modules
+  - A list of required modules can be found in docs/requirements.txt
 
-# Set configs
-sudo su - postgres -c 'sed -i -E "s/^shared_buffers = .+/shared_buffers = 2048MB/" /etc/postgresql/15/main/postgresql.conf'
-sudo su - postgres -c 'sed -i -E "s/^(local\s+all\s+all\s+)peer/\1scram-sha-256/" /etc/postgresql/15/main/pg_hba.conf'
-sudo su - postgres -c 'echo "local		${USER}		$PGSQL_MAIN_USER" >> /etc/postgresql/15/main/pg_ident.conf'
-sudo su - postgres -c 'echo "local		${USER}		$PGSQL_TEST_USER" >> /etc/postgresql/15/main/pg_ident.conf'
-
-# Create .pgpass if not exist and append users
-touch /home/${USER}/.pgpass
-chmod 600 /home/${USER}/.pgpass
-chown ${USER}:${USER} /home/${USER}/.pgpass
-echo "localhost:5432:$PGSQL_MAIN_DB:$PGSQL_MAIN_USER:$PGSQL_MAIN_PWD" >> /home/${USER}/.pgpass
-echo "localhost:5432:$PGSQL_TEST_DB:$PGSQL_TEST_USER:$PGSQL_TEST_PWD" >> /home/${USER}/.pgpass
-
-# Create a database for bot and test
-sudo su - postgres -c createuser $PGSQL_MAIN_USER -p $PGSQL_MAIN_PWD
-sudo su - postgres -c createdb -O $PGSQL_MAIN_USER $PGSQL_MAIN_USER
-sudo su - postgres -c createuser $PGSQL_MAIN_USER -p $PGSQL_MAIN_PWD
-sudo su - postgres -c createdb -O $PGSQL_MAIN_USER $PGSQL_MAIN_USER
-
-# May as well create the .env file while we're at it
-echo "# PGSQL_DB=postgresql://$PGSQL_MAIN_USER@localhost/$PGSQL_MAIN_DB" >> /home/${USER}/moe/.env
-echo "PGSQL_DB=postgresql://$PGSQL_TEST_USER@localhost/$PGSQL_TEST_DB" >> /home/${USER}/moe/.env
-
-# Clear the environment variables now we're done with them
-PGSQL_TEST_USER=
-PGSQL_MAIN_USER=
-PGSQL_MAIN_PWD=
-PGSQL_TEST_PWD=
-POSTGRES_UNIX_PWD=
-
-# restart the daemon to apply changes
-sudo /etc/init.d/postgresql restart
-echo "PostgreSQL Setup Complete!"
-
-# install and update python, pip, and create virtual environment
-echo "Installing python and pip modules"
-sudo apt install python3 python3-venv python3-pip
-
-python3 -m venv /home/${USER}/moe/pvenv
-source /home/${USER}/moe/pvenv/bin/activate
-
-pip install -U pip
-pip install discord.py transformers py-dotenv torch psycopg2-binary
-```
 ___
 
 ### Response Generation Parameters
 
-- > inputs (required)
+inputs
   - text (required)
     - The last input from the user in the conversation.
   - generated_responses
     - A list of strings corresponding to the earlier replies from the model.
   - past_user_inputs
     - A list of strings corresponding to the earlier replies from the user. Should be of the same length of generated_responses.
-  - parameters
-    - a dict containing the following keys:
+  - parameters (a dict containing the following keys)
     - min_length (Default: None).
       - Integer to define the minimum length in tokens of the output summary.
     - max_length (Default: None).
@@ -113,8 +55,8 @@ ___
       - Float (0.0-100.0). The more a token is used within generation the more it is penalized to not be picked in successive generation passes.
     - max_time (Default: None).
       - Float (0-120.0). The amount of time in seconds that the query should take maximum. Network can cause some overhead so it will be a soft limit.
-- options
-  - a dict containing the following keys:
+options
+  - a dictionary containing the following keys:
     - use_cache (Default: true). Boolean. There is a cache layer on the inference API to speedup requests we have already seen. Most models can use those results as is as models are deterministic (meaning the results will be the same anyway). However if you use a non deterministic model, you can set this parameter to prevent the caching mechanism from being used resulting in a real new query.
     - wait_for_model (Default: false) Boolean. If the model is not ready, wait for it instead of receiving 503. It limits the number of requests required to get your inference done. It is advised to only set this flag to true after receiving a 503 error as it will limit hanging in your application to known places.
 
@@ -122,13 +64,17 @@ ___
 
 ## Changelog
 
-0.0.1 - Initial Public Release
+- 0.0.2
+  - Save channel/guild contexts separately
+  - Concurrent message processing
+  - Purge guild data when bot is removed from guild
+- 0.0.1
+  - Initial Public Release
 
 ## To do
- - Add PostgreSQL support with separate channel contexts
- - Auto-delete channel data when bot is removed from a guild
+
+ - Fix the install.sh script
  - Ignore direct messages
- - Bug: is_processing queues between servers/channels
  - Reply to replies to bot messages:
 > ```py
 >   referenced_message = await message.channel.fetch_message(message.reference.message_id)

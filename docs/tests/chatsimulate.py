@@ -1,44 +1,43 @@
-# cogs/events.py
+# cogs/chatsimulation.py
 import discord
 from discord.ext import commands
-from utils.logroll import log
-from utils.pgsql import drop_guild_input_ids, drop_reply_channel
+import asyncio
 
-class Events(commands.Cog):
+class ChatSimulate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.processing_channel = {}
 
     @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        log.info(f'Joined new guild: {guild.name}')
-        join_announcement = (f'hey whats up {guild.name}, im moe!')
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
 
-        if guild.system_channel is not None:
-            await guild.system_channel.send(join_announcement)
-        else:
-            for channel in guild.text_channels:
-                if channel.permissions_for(guild.me).send_messages:
-                    await channel.send(join_announcement)
-                    break
+        channel_id = message.channel.id
+        if channel_id in self.processing_channel:
+            return
 
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-        guild_id = guild.id
-        await drop_guild_input_ids(guild_id)
-        await drop_reply_channel(guild_id)
-        log.info(f'Removed from guild: {guild.name}')
+        typing_task = asyncio.create_task(self.send_typing(message.channel))
+        self.processing_channel[channel_id] = typing_task
 
-    # @commands.Cog.listener()
-    # async def on_member_join(self, member):  # Add self as the first parameter
-    #     log.info(f'Member joined: {member.name}')
-    #     channel = discord.utils.get(member.guild.channels, name='general')
-    #     if channel:
-    #         await channel.send(f'Welcome to the server, {member.mention}!')
-    #         log.info(f'Sent welcome message to {member.mention}')
+        try:
+            await asyncio.sleep(2)  # simulate message processing
+            await message.channel.send(f"Processed message: {message.content}")
+
+        finally:
+            typing_task.cancel()
+            del self.processing_channel[channel_id]
+
+    async def send_typing(self, channel):
+        try:
+            while True:
+                await channel.typing()
+                await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            pass
 
 async def setup(bot):
-    await bot.add_cog(Events(bot))
-
+    await bot.add_cog(ChatSimulate(bot))
 
 
 

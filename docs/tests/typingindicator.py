@@ -1,45 +1,38 @@
-# cogs/events.py
+# cogs/typingindicator.py
 import discord
 from discord.ext import commands
-from utils.logroll import log
-from utils.pgsql import drop_guild_input_ids, drop_reply_channel
+import asyncio
+import random
 
-class Events(commands.Cog):
+class TypingIndicator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild):
-        log.info(f'Joined new guild: {guild.name}')
-        join_announcement = (f'hey whats up {guild.name}, im moe!')
+    @commands.command()
+    async def testtype(self, ctx):
+        """Test Typing Indicator in Multiple Channels."""
+        messages = [f"Message {i}" for i in range(10)]
+        tasks = [asyncio.create_task(self.process_message(ctx, message, i)) for i, message in enumerate(messages)]
+        await asyncio.gather(*tasks)
 
-        if guild.system_channel is not None:
-            await guild.system_channel.send(join_announcement)
-        else:
-            for channel in guild.text_channels:
-                if channel.permissions_for(guild.me).send_messages:
-                    await channel.send(join_announcement)
-                    break
+    async def send_typing(self, ctx):
+        while True:
+            print(f"{ctx.channel}: Typing...")
+            await asyncio.sleep(5)
 
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-        guild_id = guild.id
-        await drop_guild_input_ids(guild_id)
-        await drop_reply_channel(guild_id)
-        log.info(f'Removed from guild: {guild.name}')
-
-    # @commands.Cog.listener()
-    # async def on_member_join(self, member):  # Add self as the first parameter
-    #     log.info(f'Member joined: {member.name}')
-    #     channel = discord.utils.get(member.guild.channels, name='general')
-    #     if channel:
-    #         await channel.send(f'Welcome to the server, {member.mention}!')
-    #         log.info(f'Sent welcome message to {member.mention}')
+    async def process_message(self, ctx, message, task_id):
+        typing_task = asyncio.create_task(self.send_typing(ctx))
+        try:
+            delay = random.uniform(0.5, 3.0)
+            print(f"Processing {message} with task ID {task_id}, will take {delay:.2f} seconds.")
+            await asyncio.sleep(delay)
+            response = f"Processed {message} with task ID {task_id}."
+            print(response)
+        finally:
+            typing_task.cancel()
 
 async def setup(bot):
-    await bot.add_cog(Events(bot))
-
-
+    await bot.add_cog(TypingIndicator(bot))
 
 
 ####################################################################################
