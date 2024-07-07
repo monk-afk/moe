@@ -32,6 +32,9 @@ class Chat(commands.Cog):
         if message.content.startswith(self.bot.command_prefix):
             return
 
+        if message.guild is None:
+            return
+
         channel_id = message.channel.id
         if channel_id in self.processing_channel:
             return

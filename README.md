@@ -64,6 +64,9 @@ ___
 
 ## Changelog
 
+- 0.0.4
+  - Ignore direct messages
+  - bugfix trailing eos token
 - 0.0.3
   - bugfix for context saving
 - 0.0.2
@@ -76,7 +79,6 @@ ___
 ## To do
 
  - Fix the install.sh script
- - Ignore direct messages
  - Reply to replies to bot messages:
 > ```py
 >   referenced_message = await message.channel.fetch_message(message.reference.message_id)
