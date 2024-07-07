@@ -67,11 +67,11 @@ class Chat(commands.Cog):
         eos_count = 0
         final_saved_input_ids = []
         for token in reversed(new_saved_input_ids):
-            final_saved_input_ids.insert(0, token)
             if token == 50256:
                 eos_count += 1
             if eos_count == 10:
                 break
+            final_saved_input_ids.insert(0, token)
 
         set_channel_input_ids(channel_id, guild_id, final_saved_input_ids)
         bot_input_ids = torch.tensor(final_saved_input_ids).unsqueeze(0)
