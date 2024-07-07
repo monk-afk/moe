@@ -64,6 +64,8 @@ ___
 
 ## Changelog
 
+- 0.0.3
+  - bugfix for context saving
 - 0.0.2
   - Save channel/guild contexts separately
   - Concurrent message processing
