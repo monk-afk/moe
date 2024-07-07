@@ -68,7 +68,7 @@ source /home/${USER}/moe/pvenv/bin/activate
 pip3 install -U pip
 
 for MODULE in `cat requirements.txt`
-  do pip3 install $MODULE
+  do pip3 --no-cache-dir install -U $MODULE
 done
 
 
