@@ -28,11 +28,6 @@ class moeBot(commands.Bot):
                     print(f'Failed to load cog {cog_name}: {str(e)}')
         print(f'Bot is ready. Logged in as {self.user.name}')
 
-    # async def on_message(self, message):
-    #     if message.author.bot:
-    #         return
-    #     await self.process_commands(message)
-
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             await ctx.send('Command not found.')

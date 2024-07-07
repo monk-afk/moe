@@ -145,9 +145,8 @@ def get_channel_input_ids(channel_id):
             WHERE channel_id = %s
         """, (channel_id,))
         result = cursor.fetchone()
-        input_ids = result['input_ids'] if result and result['input_ids'] else []
-        log.info(f'Fetched channel input ids {channel_id}:{input_ids}')
-        return input_ids
+        log.info(f'Fetched channel input ids {channel_id}:{result}')
+        return result['input_ids'] if result else None
     except Exception as e:
         log.error(f'Error fetching input_ids for channel {channel_id}: {e}')
         return []

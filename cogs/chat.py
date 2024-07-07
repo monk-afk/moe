@@ -55,29 +55,26 @@ class Chat(commands.Cog):
     async def generate_response(self, message):
         channel_id = message.channel.id
         guild_id = message.guild.id
-        chat_history_ids = get_channel_input_ids(channel_id)
+        saved_input_ids = get_channel_input_ids(channel_id)
+
         new_user_input_ids = self.tokenizer.encode(message.content + self.tokenizer.eos_token, return_tensors='pt')
-        bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if len(chat_history_ids) > 0 else new_user_input_ids
 
-        flat_token_ids = bot_input_ids.flatten().tolist()
-        messages = []
-        current_message = []
+        if saved_input_ids is None:
+            saved_input_ids = []
 
-        for token_id in flat_token_ids:
-            if token_id == self.tokenizer.eos_token_id:
-                if current_message:
-                    messages.append(current_message)
-                    current_message = []
-            else:
-                current_message.append(token_id)
-        if current_message:
-            messages.append(current_message)
+        new_saved_input_ids = saved_input_ids + new_user_input_ids.flatten().tolist()
 
-        if len(messages) > 9:
-            last_10_messages = messages[9:]
-            flattened_last_10_with_delimiters = [token for message in last_10_messages for token in message + [self.tokenizer.eos_token_id]]
-            result_tensor = torch.tensor([flattened_last_10_with_delimiters])
-            bot_input_ids = result_tensor
+        eos_count = 0
+        final_saved_input_ids = []
+        for token in reversed(new_saved_input_ids):
+            final_saved_input_ids.insert(0, token)
+            if token == 50256:
+                eos_count += 1
+            if eos_count == 10:
+                break
+
+        set_channel_input_ids(channel_id, guild_id, final_saved_input_ids)
+        bot_input_ids = torch.tensor(final_saved_input_ids).unsqueeze(0)
 
         attention_mask = torch.ones_like(bot_input_ids)
         chat_history_ids = self.model.generate(
@@ -90,10 +87,8 @@ class Chat(commands.Cog):
             top_k = 50,
             top_p = 0.9,
             temperature = 0.7,
-            repetition_penalty = 1.0
+            repetition_penalty = 0.1
         )
-
-        set_channel_input_ids(guild_id, channel_id, bot_input_ids.flatten().tolist())
 
         response = self.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
         await asyncio.sleep(5)
