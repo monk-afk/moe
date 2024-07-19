@@ -2,7 +2,7 @@
 
 A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
 
-<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/moe/main/images/moe_bot/rgb_32b_floatpt/squareone_moe_icon_1280px.png" width="64"/>
+<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/moe/main/images/rgb_32b_floatpt/squareone_moe_icon_1280px.png" width="64"/>
 
 [![](https://dcbadge.limes.pink/api/server/CFBC8juT8c)](https://discord.gg/CFBC8juT8c)
 
