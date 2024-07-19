@@ -11,7 +11,7 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         log.info(f'Joined new guild: {guild.name}')
-        join_announcement = (f'hey whats up {guild.name}, im moe!')
+        join_announcement = (f'hey {guild.name}, im moe! use `m1 help` for my command list')
 
         if guild.system_channel is not None:
             await guild.system_channel.send(join_announcement)
@@ -24,8 +24,8 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         guild_id = guild.id
-        await drop_guild_input_ids(guild_id)
-        await drop_reply_channel(guild_id)
+        drop_guild_input_ids(guild_id)
+        drop_reply_channel(guild_id)
         log.info(f'Removed from guild: {guild.name}')
 
     # @commands.Cog.listener()

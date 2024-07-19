@@ -1,59 +1,44 @@
-# cogs/tools.py
 import discord
 from discord.ext import commands
-from utils.pgsql import (
-    set_reply_channel,
-    drop_reply_channel,
-    drop_guild_input_ids,
-    drop_channel_input_ids
-)
 
-class Tools(commands.Cog):
-    """Tools for managing the bot's behavior."""
-
+class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def ping(self, ctx):
-        """Check the bot's latency."""
-        await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms")
+    @commands.command(name="help", help="Shows this message")
+    async def custom_help(self, ctx, *cog_names):
+        if not cog_names:
+            embed = discord.Embed(title="Help", description="List of available commands:", color=discord.Color.red())
+            embed.set_thumbnail(url=ctx.bot.user.avatar)
+            for cog_name, cog in self.bot.cogs.items():
+                if cog.get_commands():
+                    cog_commands = [f"`{command.name}`: {command.help or 'No description'}" for command in cog.get_commands()]
+                    embed.add_field(name=cog_name, value="\n".join(cog_commands), inline=False)
+            await ctx.send(embed=embed)
+        else:
+            for cog_name in cog_names:
+                cog = self.bot.get_cog(cog_name)
+                if cog:
+                    embed = discord.Embed(title=f"Help - {cog_name}", description=cog.__doc__, color=discord.Color.red())
+                    embed.set_thumbnail(url=ctx.bot.user.avatar)
+                    for command in cog.get_commands():
+                        embed.add_field(name=command.name, value=command.help or "No description", inline=False)
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send(f"No cog named `{cog_name}` found.")
 
     @commands.command()
-    @commands.has_permissions(manage_messages=True)
-    async def forgetchannel(self, ctx):
-        """Clear the focused channel chat memory."""
-        channel_id = ctx.channel.id
-        drop_channel_input_ids(channel_id)
-        await ctx.send(f"I have no memory of {ctx.channel.name}")
+    async def source(self, ctx):
+        """Link to source code."""
+        await ctx.send(f"{ctx.bot.user} source code: https://github.com/monk-afk/moe")
 
     @commands.command()
-    @commands.has_permissions(manage_messages=True)
-    async def forgetguild(self, ctx):
-        """Clear all chat memory of this Guild."""
-        guild_id = ctx.guild.id
-        drop_guild_input_ids(guild_id)
-        await ctx.send(f"Cleared all channel data for guild {ctx.guild.name}.")
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def setreplychannel(self, ctx):
-        """Set the reply channel for the guild."""
-        guild_id = ctx.guild.id
-        channel_id = ctx.channel.id
-        set_reply_channel(guild_id, channel_id)
-        await ctx.send(f"Reply channel set to {ctx.channel.mention}")
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def unsetreplychannel(self, ctx):
-        """Unset the reply channel for the guild."""
-        guild_id = ctx.guild.id
-        drop_reply_channel(guild_id)
-        await ctx.send("Reply channel unset. I will still reply if you call my name.")
+    async def moedc(self, ctx):
+        """Official Discord server."""
+        await ctx.send(f"{ctx.bot.user} Discord server: https://discord.gg/CFBC8juT8c")
 
 async def setup(bot):
-    await bot.add_cog(Tools(bot))
+    await bot.add_cog(Help(bot))
 
 
 

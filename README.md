@@ -2,9 +2,9 @@
 
 A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
 
-<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/SquareOne/main/images/moe_bot/rgb_32b_floatpt/squareone_moe_icon_1280px.png" width="64"/>
+<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/moe/main/images/moe_bot/rgb_32b_floatpt/squareone_moe_icon_1280px.png" width="64"/>
 
-### &nbsp;&nbsp;&nbsp;[![](https://dcbadge.limes.pink/api/server/pE4Tu3cf23)](https://discord.gg/pE4Tu3cf23)
+[![](https://dcbadge.limes.pink/api/server/CFBC8juT8c)](https://discord.gg/CFBC8juT8c)
 
 This Readme is incomplete and may contain errors.
 
@@ -64,14 +64,18 @@ ___
 
 ## Changelog
 
+- 0.0.5
+  - Properly formatted help message
+  - Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)
+  - Fix errors on Guild removal [#5](https://github.com/monk-afk/moe/issues/5)
 - 0.0.4
   - Ignore direct messages
   - bugfix trailing eos token
 - 0.0.3
-  - bugfix for context saving
+  - bugfix for context saving [#2](https://github.com/monk-afk/moe/issues/2)
 - 0.0.2
   - Save channel/guild contexts separately
-  - Concurrent message processing
+  - Concurrent message processing [#1](https://github.com/monk-afk/moe/issues/1)
   - Purge guild data when bot is removed from guild
 - 0.0.1
   - Initial Public Release

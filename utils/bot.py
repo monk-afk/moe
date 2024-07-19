@@ -34,6 +34,7 @@ class moeBot(commands.Bot):
 
 def run_bot():
     bot = moeBot(config)
+    bot.remove_command('help')
     bot.run(config.discord_token)
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective Date: July 3, 2024
+Effective Date: July 18, 2024
 
 ## Introduction
 
@@ -14,7 +14,7 @@ We do not collect personally identifiable information from users through the Cha
 
 ### Non-Personal Information
 
-We may collect and temporarily store non-personal information about users whenever they interact with the Chatbot. This information is limited to chat messages and Discord User ID. Messages contatining the Chatbot's name, messages sent within the designated reply channel, or messages sent to the bot via direct message. The contents of the messages are stored as encoded integers, and are not readable without Tensor decoding software.
+We may collect and temporarily store non-personal information about users whenever they interact with the Chatbot. This information is limited to chat messages, Guild ID, and Discord User ID. Messages contatining the Chatbot's name, messages sent within the designated reply channel. The contents of the messages are stored as encoded tensors, and are not readable without Tensor decoding software.
 
 ## How We Use Your Information
 
@@ -24,7 +24,7 @@ We may use non-personal information collected from users to:
 - Monitor the usage of the Chatbot for technical purposes.
 - Provide technical support and respond to user inquiries.
 
-Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) messages are stored per channel, reply channel, or direct message.
+Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) messages are stored per channel, reply channel.
 
 You may request deletion of these messages by using the commands included with the Chatbot, which can be found using the Chatbot's help command.
 
@@ -32,7 +32,7 @@ Any stored messages associated with a Guild are automatically deleted when the C
 
 ## Disclosure of Your Information
 
-We do not disclose non-personal information collected from users to third parties except as required for the operation of the Chatbot or as otherwise permitted by law.
+We do not disclose information collected from users to third parties except as required for the operation of the Chatbot or as otherwise required by law-enforcement.
 
 ## Security of Your Information
 
@@ -52,4 +52,4 @@ We may update our Privacy Policy from time to time. We will notify you of any ch
 
 ## Contact Us
 
-If you have any questions about this Privacy Policy, please contact us at admin@squareone.moe.
+If you have any questions about this Privacy Policy, please contact us at admin@monk.moe.
