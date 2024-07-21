@@ -1,3 +1,4 @@
+# cogs/help.py
 import discord
 from discord.ext import commands
 

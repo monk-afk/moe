@@ -12,7 +12,7 @@ from utils.pgsql import (
 import asyncio
 
 patterns = {
-    "moe": r".*\b[M,m][o,ø]e\b.*",
+    "moe": r".*\b@?[M,m][o,ø]e\b.*",
     "bot": r".*\bbot\b.*",
 }
 
@@ -48,11 +48,12 @@ class Chat(commands.Cog):
 
     async def processor(self, message):
         channel_id = message.channel.id
-        async with message.channel.typing():
-            try:
-                await self.generate_response(message)
-            finally:
-                del self.processing_channel[channel_id]
+        typing_task = asyncio.create_task(self.send_typing(message.channel))
+        try:
+            await self.generate_response(message)
+        finally:
+            typing_task.cancel()
+            del self.processing_channel[channel_id]
 
     async def generate_response(self, message):
         channel_id = message.channel.id
@@ -87,15 +88,22 @@ class Chat(commands.Cog):
             attention_mask = attention_mask,
             do_sample = True,
             top_k = 50,
-            top_p = 0.9,
-            temperature = 0.7,
+            top_p = 0.7,
+            temperature = 0.9,
             repetition_penalty = 1.0
         )
 
         response = self.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
-        
         await asyncio.sleep(5)
         await message.channel.send(response)
+
+    async def send_typing(self, channel):
+        try:
+            while True:
+                await channel.typing()
+                await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            pass
 
 async def setup(bot):
     await bot.add_cog(Chat(bot))
