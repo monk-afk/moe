@@ -67,7 +67,7 @@ ___
 
 - 0.0.7
   - Tidy reply conditional
-  - Add reply referencing [#7](https://github.com/monk-afk/moe/issues/7)
+  - ~~Add reply referencing [#7](https://github.com/monk-afk/moe/issues/7)~~
 - 0.0.6
   - Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)
 - 0.0.5
