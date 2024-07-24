@@ -26,39 +26,25 @@ class Chat(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if self.should_ignore_message(message):
+        if message.author == self.bot.user or message.author.bot:
             return
 
-        if self.should_process_message(message):
-            self.processing_channel[message.channel.id] = True
-            asyncio.create_task(self.processor(message))
+        if message.content.startswith(self.bot.command_prefix):
+            return
 
-    def should_ignore_message(self, message):
-        return (
-            message.author == self.bot.user
-            or message.author.bot
-            or message.content.startswith(self.bot.command_prefix)
-            or message.guild is None
-            or message.channel.id in self.processing_channel
-        )
+        if message.guild is None:
+            return
 
-    def should_process_message(self, message):
-        return (
-            self.is_reply_channel(message)
-            or self.contains_pattern(message)
-            or self.is_reply(message)
-        )
+        channel_id = message.channel.id
+        if channel_id in self.processing_channel:
+            return
 
-    def is_reply_channel(self, message):
         guild_id = message.guild.id
         reply_channel = get_reply_channel(guild_id)
-        return message.channel.id == reply_channel
 
-    def contains_pattern(self, message):
-        return any(re.match(pattern, message.content.lower()) for pattern in patterns.values())
-
-    def is_reply(self, message):
-        return message.reference is not None
+        if channel_id == reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()):
+            self.processing_channel[channel_id] = True 
+            asyncio.create_task(self.processor(message))
 
     async def processor(self, message):
         channel_id = message.channel.id
@@ -74,14 +60,7 @@ class Chat(commands.Cog):
         guild_id = message.guild.id
         saved_input_ids = get_channel_input_ids(channel_id)
 
-        # Include referenced message content if it exists
-        if message.reference:
-            ref_message = await message.channel.fetch_message(message.reference.message_id)
-            ref_content = ref_message.content + self.tokenizer.eos_token
-        else:
-            ref_content = ""
-
-        new_user_input_ids = self.tokenizer.encode(ref_content + message.content + self.tokenizer.eos_token, return_tensors='pt')
+        new_user_input_ids = self.tokenizer.encode(message.content + self.tokenizer.eos_token, return_tensors='pt')
 
         if saved_input_ids is None:
             saved_input_ids = []
@@ -116,11 +95,7 @@ class Chat(commands.Cog):
 
         response = self.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
         await asyncio.sleep(5)
-
-        if message.reference:
-            await message.channel.send(response, reference=message)
-        else:
-            await message.channel.send(response)
+        await message.channel.send(response)
 
     async def send_typing(self, channel):
         try:
