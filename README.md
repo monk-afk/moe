@@ -2,7 +2,7 @@
 
 A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
 
-<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/moe/main/images/moe_icon_solid_1280px.png" width="64"/>
+<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/moe/main/docs/images/moe_banner_v3_680x240.png" width="340"/>
 
 [![](https://dcbadge.limes.pink/api/server/CFBC8juT8c)](https://discord.gg/CFBC8juT8c)
 
@@ -10,8 +10,9 @@ This Readme is incomplete and may contain errors.
 
 ___
 
-- > Keyword Trigger
-  - The bot responds to messages containing the keywords "moe" or "bot".
+- > Response Triggers
+  - Messages containing the keywords "moe" or "bot".
+  - Reply references 
 - > Channel Specific
   - It can be configured to respond only in designated channels.
 - > AI Language Model
@@ -21,7 +22,7 @@ ___
 
 ## Installation
 
-- See docs/install.sh for steps to install
+- Install script found in docs/install.sh
 
 - PostgreSQL database.
 - Python3 (tested with 3.11)
@@ -64,6 +65,9 @@ ___
 
 ## Changelog
 
+- 0.0.7
+  - Tidy reply conditional
+  - Add reply referencing [#7](https://github.com/monk-afk/moe/issues/7)
 - 0.0.6
   - Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)
 - 0.0.5
@@ -82,16 +86,6 @@ ___
 - 0.0.1
   - Initial Public Release
 
-## To do
-
-  - Auto-delete conversation history after a period of time [#4](https://github.com/monk-afk/moe/issues/4)
-  - Fix the install.sh script
-  - Reply to replies to bot messages:
-    ```py
-      referenced_message = await message.channel.fetch_message(message.reference.message_id)
-      if referenced_message.author == bot.user:
-          is_reply_to_bot = True
-    ```
 ___
 
 ```py
