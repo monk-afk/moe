@@ -26,42 +26,34 @@ class Chat(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if self.should_ignore_message(message):
+        if message.author == self.bot.user or message.author.bot:
             return
 
-        if await self.should_process_message(message):
-            self.processing_channel[message.channel.id] = True 
-            asyncio.create_task(self.processor(message))
+        if message.content.startswith(self.bot.command_prefix):
+            return
 
-    def should_ignore_message(self, message):
-        return (
-            message.author == self.bot.user or
-            message.author.bot or
-            message.content.startswith(self.bot.command_prefix) or
-            message.guild is None
-        )
+        if message.guild is None:
+            return
 
-    async def should_process_message(self, message):
-        return (
-            self.is_reply_channel(message) or
-            self.contains_pattern(message)
-        )
+        channel_id = message.channel.id
+        if channel_id in self.processing_channel:
+            return
 
-    def is_reply_channel(self, message):
         guild_id = message.guild.id
         reply_channel = get_reply_channel(guild_id)
-        return message.channel.id == reply_channel
 
-    def contains_pattern(self, message):
-        return any(re.match(pattern, message.content.lower()) for pattern in patterns.values())
+        if channel_id == reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()):
+            self.processing_channel[channel_id] = True 
+            asyncio.create_task(self.processor(message))
 
     async def processor(self, message):
+        channel_id = message.channel.id
         typing_task = asyncio.create_task(self.send_typing(message.channel))
         try:
             await self.generate_response(message)
         finally:
             typing_task.cancel()
-            del self.processing_channel[message.channel.id]
+            del self.processing_channel[channel_id]
 
     async def generate_response(self, message):
         channel_id = message.channel.id
