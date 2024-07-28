@@ -9,7 +9,7 @@ pgsql_db = os.getenv('PGSQL_DB')
 class Config:
     def __init__(self):
         self.discord_token = os.getenv('AUTH_TOKEN')
-        self.discord_prefix = 'm1 '
+        self.discord_prefix = os.getenv('CMD_PREFIX') + ' '
         self.discord_intents = self.get_discord_intents()
 
     @staticmethod

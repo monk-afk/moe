@@ -12,9 +12,13 @@ ___
 
 - > Response Triggers
   - Messages containing the keywords "moe" or "bot".
-  - Reply references 
+
 - > Channel Specific
   - It can be configured to respond only in designated channels.
+
+- > User Specific
+  - It can be configured to respond to any messages from specified users.
+
 - > AI Language Model
   - Utilizes the DialoGPT model from Microsoft to simulate chat.
 
@@ -29,6 +33,24 @@ ___
 - python3-venv for virtual environment
 - python3-pip for additional libraries and modules
   - A list of required modules can be found in docs/requirements.txt
+
+___
+
+## Available Commands
+
+Set the command prefix in the .env file;
+
+- help: Shows this message
+- source: Link to source code
+- moedc: Official Discord server
+- ping: Check the bot's latency
+- forgetchannel: Clear the focused channel chat memory
+- forgetguild: Clear all chat memory of this Guild
+- setreplychannel: Set the reply channel for the guild
+- unsetreplychannel: Unset the reply channel for the guild
+- sayhello: Add User to the reply-to list
+- saybye: Remove User from the reply-to list
+
 
 ___
 
@@ -66,7 +88,8 @@ ___
 ## Changelog
 
 - 0.0.7
-  - Tidy reply conditional
+  - Commands for user reply-to
+  - ~~Tidy reply conditional~~
   - ~~Add reply referencing [#7](https://github.com/monk-afk/moe/issues/7)~~
 - 0.0.6
   - Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)

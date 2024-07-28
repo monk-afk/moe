@@ -5,7 +5,9 @@ from utils.pgsql import (
     set_reply_channel,
     drop_reply_channel,
     drop_guild_input_ids,
-    drop_channel_input_ids
+    drop_channel_input_ids,
+    set_reply_to,
+    drop_reply_to,
 )
 
 class Tools(commands.Cog):
@@ -51,6 +53,22 @@ class Tools(commands.Cog):
         guild_id = ctx.guild.id
         drop_reply_channel(guild_id)
         await ctx.send("Reply channel unset. I will still reply if you call my name.")
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def sayhello(self, ctx, user: discord.User):
+        """Add User to the reply-to list."""
+        set_reply_to(user.id)
+        await ctx.send(f"Hello {user.name}!")
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def saybye(self, ctx, user: discord.User):
+        """Remove User from the reply-to list."""
+        drop_reply_to(user.id)
+        await ctx.send(f"Bye {user.name}!")
+
+    
 
 async def setup(bot):
     await bot.add_cog(Tools(bot))

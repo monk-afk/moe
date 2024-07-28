@@ -8,6 +8,7 @@ from utils.pgsql import (
     get_reply_channel,
     get_channel_input_ids,
     set_channel_input_ids,
+    check_reply_to,
 )
 import asyncio
 
@@ -42,7 +43,7 @@ class Chat(commands.Cog):
         guild_id = message.guild.id
         reply_channel = get_reply_channel(guild_id)
 
-        if channel_id == reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()):
+        if channel_id == reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()) or check_reply_to(message.author.id):
             self.processing_channel[channel_id] = True 
             asyncio.create_task(self.processor(message))
 

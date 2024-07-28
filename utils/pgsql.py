@@ -39,6 +39,11 @@ def create_tables():
                 input_ids INTEGER[]
             )
         """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS replyto_users (
+                user_id BIGINT PRIMARY KEY
+            )
+        """)
         # cursor.execute("""
         #     CREATE TABLE IF NOT EXISTS user_data (
         #         user_id BIGINT PRIMARY KEY,
@@ -94,6 +99,7 @@ def set_channel_input_ids(channel_id, guild_id, input_ids):
         cursor.close()
         return_connection(conn)
 
+
 # set/update bot input ids for a user
 # def set_user_input_ids(user_id, input_ids):
 #     conn = get_connection()
@@ -113,6 +119,64 @@ def set_channel_input_ids(channel_id, guild_id, input_ids):
 #     finally:
 #         cursor.close()
 #         return_connection(conn)
+
+# add userID for replying to
+def set_reply_to(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO replyto_users (user_id)
+            VALUES (%s)
+            ON CONFLICT (user_id) DO NOTHING
+        """, (user_id,))
+        conn.commit()
+        log.info(f'UserID {user_id} added to replyto_users')
+    except Exception as e:
+        log.error(f'Error adding {user_id} to replyto_users: {e}')
+        raise
+    finally:
+        cursor.close()
+        return_connection(conn)
+
+
+def check_reply_to(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT user_id
+            FROM replyto_users
+            WHERE user_id = %s
+        """, (user_id,))
+        result = cursor.fetchone()
+        log.info(f'Checked replyto_users {user_id}: {result}')
+        return result is not None
+    except Exception as e:
+        log.error(f'Error checking replyto_users {user_id}: {e}')
+        return False
+    finally:
+        cursor.close()
+        return_connection(conn)
+
+
+def drop_reply_to(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+          DELETE FROM replyto_users
+          WHERE user_id = %s
+        """, (user_id,))
+        conn.commit()
+        log.info(f'Removed {user_id} from replyto_users')
+    except Exception as e:
+        log.error(f'Error removing {user_id} from replyto_users: {e}')
+        raise
+    finally:
+        cursor.close()
+        return_connection(conn)
+
 
 # get reply channel for a guild
 def get_reply_channel(guild_id):
