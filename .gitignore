@@ -1,5 +1,6 @@
-.env
-.swp
-__pycache__
-logs
-pyven
+*.env
+*.swp
+*.tmp
+__pycache__/
+logs/
+pyven/

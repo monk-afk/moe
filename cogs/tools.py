@@ -57,14 +57,14 @@ class Tools(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def sayhello(self, ctx, user: discord.User):
-        """Add User to the reply-to list."""
+        """Add UserID to the reply-to list."""
         set_reply_to(user.id)
         await ctx.send(f"Hello {user.name}!")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def saybye(self, ctx, user: discord.User):
-        """Remove User from the reply-to list."""
+        """Remove UserID from the reply-to list."""
         drop_reply_to(user.id)
         await ctx.send(f"Bye {user.name}!")
 

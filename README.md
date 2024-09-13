@@ -2,55 +2,58 @@
 
 A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
 
-<img decoding="async" loading="lazy" alt="moe icon of a red and black checkered diamond" src="https://raw.githubusercontent.com/monk-afk/moe/main/docs/images/moe_banner_v3_680x240.png" width="340"/>
+<img decoding="async" loading="lazy" alt="moe banner red and white pixelated letters" src="https://raw.githubusercontent.com/monk-afk/moe/images/rgb_32b_floatpt/squareone_moe_banner_style_680x240.png"  width="340"/>
 
-[![](https://dcbadge.limes.pink/api/server/CFBC8juT8c)](https://discord.gg/CFBC8juT8c)
+møe's official home is at the SquareOne Discord:
 
-This Readme is incomplete and may contain errors.
+[![](https://dcbadge.limes.pink/api/server/pE4Tu3cf23)](https://discord.gg/pE4Tu3cf23)
+
+[Invite moe to your server!](https://discord.com/oauth2/authorize?client_id=1249786267898740757)
 
 ___
 
-- > Response Triggers
+- Casual Conversational AI Language Model
+  - Powered by [DialoGPT, courtesy of Huggingface](https://huggingface.co/docs/transformers/main/en/model_doc/dialogpt)!
+
+- Response Triggers
   - Messages containing the keywords "moe" or "bot".
 
-- > Channel Specific
-  - It can be configured to respond only in designated channels.
+- Specific Reply-to Channel
+  - Configure to respond in designated channels
 
-- > User Specific
-  - It can be configured to respond to any messages from specified users.
+- Specific Reply-to User(s)
+  - Will follow and reply to specified users
 
-- > AI Language Model
-  - Utilizes the DialoGPT model from Microsoft to simulate chat.
+___
+
+
+## Usage Examples
+
+- When møe joins a guild, set a reply channel for him to chat freely:
+  - In the designated channel, type: `m1 setreplychannel`
+  - To unset a reply channel, type: `m1 unsetreplychannel`
+
+- If a member needs extra attention, set a reply-to and møe will respond to their messages:
+  - In any channel, type: `m1 sayhello @user`
+  - To stop the replies, type: `m1 saybye @user`
+
+- møe will remember the context of a conversation per-channel for up to ten messages:
+  - To erase his memory in a channel, type: `m1 forgetchannel`
+  - To erase his memory of all channels, type: `m1 forgetguild`
+
+- Thats pretty much it. He's just a chat bot.
+  - For all commands, type: `m1 help`
 
 ___
 
 ## Installation
 
 - Install script found in docs/install.sh
-
 - PostgreSQL database.
 - Python3 (tested with 3.11)
 - python3-venv for virtual environment
 - python3-pip for additional libraries and modules
   - A list of required modules can be found in docs/requirements.txt
-
-___
-
-## Available Commands
-
-Set the command prefix in the .env file;
-
-- help: Shows this message
-- source: Link to source code
-- moedc: Official Discord server
-- ping: Check the bot's latency
-- forgetchannel: Clear the focused channel chat memory
-- forgetguild: Clear all chat memory of this Guild
-- setreplychannel: Set the reply channel for the guild
-- unsetreplychannel: Unset the reply channel for the guild
-- sayhello: Add User to the reply-to list
-- saybye: Remove User from the reply-to list
-
 
 ___
 
@@ -78,7 +81,8 @@ inputs
       - Float (0.0-100.0). The more a token is used within generation the more it is penalized to not be picked in successive generation passes.
     - max_time (Default: None).
       - Float (0-120.0). The amount of time in seconds that the query should take maximum. Network can cause some overhead so it will be a soft limit.
-options
+options 
+  > (these apply only for the Inference API, not to the pre-trained transformers model)
   - a dictionary containing the following keys:
     - use_cache (Default: true). Boolean. There is a cache layer on the inference API to speedup requests we have already seen. Most models can use those results as is as models are deterministic (meaning the results will be the same anyway). However if you use a non deterministic model, you can set this parameter to prevent the caching mechanism from being used resulting in a real new query.
     - wait_for_model (Default: false) Boolean. If the model is not ready, wait for it instead of receiving 503. It limits the number of requests required to get your inference done. It is advised to only set this flag to true after receiving a 503 error as it will limit hanging in your application to known places.
@@ -87,9 +91,11 @@ ___
 
 ## Changelog
 
+- 0.0.8
+  - Command prefix is now in the .env file
+  - Add reply-to command
 - 0.0.7
-  - Commands for user reply-to
-  - ~~Tidy reply conditional~~
+  - Tidy reply conditional
   - ~~Add reply referencing [#7](https://github.com/monk-afk/moe/issues/7)~~
 - 0.0.6
   - Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)
