@@ -2,6 +2,8 @@
 # THIS SCRIPT STILL NEEDS TESTING AND FIXING
 # Likely doesn't work, but the steps are there.
 
+MOEDIR="/home/${USER}/moe"
+
 # Install and Setup PostgreSQL
 sudo apt update
 sudo apt install -y gnupg2
@@ -53,7 +55,7 @@ sudo su - postgres -c "psql -c \"ALTER USER ${PGSQL_TEST_USER} WITH PASSWORD '${
 sudo su - postgres -c "createdb -O ${PGSQL_TEST_USER} ${PGSQL_TEST_DB}"
 
 # May as well create the .env file while we're at it
-ENV_FILE="../.env"
+ENV_FILE="$MOEDIR/.env"
 echo "# PGSQL_DB=postgresql://${PGSQL_MAIN_USER}@localhost/${PGSQL_MAIN_DB}" >> ${ENV_FILE}
 echo "PGSQL_DB=postgresql://${PGSQL_TEST_USER}@localhost/${PGSQL_TEST_DB}" >> ${ENV_FILE}
 
@@ -63,18 +65,24 @@ unset PGSQL_MAIN_USER
 unset PGSQL_MAIN_PWD
 unset PGSQL_TEST_PWD
 
-# restart the daemon to apply changes
+# Restart the daemon to apply changes
 sudo /etc/init.d/postgresql restart
 echo "PostgreSQL Setup Complete!"
 
-# install and update python, pip, and create virtual environment
+# Install and update python, pip, and create virtual environment
 echo "Installing python and pip modules"
 sudo apt install -y python3 python3-venv python3-pip
 
 python3 -m venv ../pvenv
 source ../pvenv/bin/activate
-
 pip3 install -U pip
+
+# Install minimum version 2.5.0 from discord.py repository
+# Reaction emoji support requires v2.5.0 or greater
+cd ${MOEDIR}/pyven/lib/python3.11/site-packages/
+git clone https://github.com/Rapptz/discord.py
+cd discord.py
+python3 -m pip install -U .
 
 for MODULE in $(cat requirements.txt); do
   pip3 --no-cache-dir install $MODULE

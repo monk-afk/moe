@@ -1,46 +1,57 @@
-# cogs/help.py
+# cogs/react.py
 import discord
+import re
 from discord.ext import commands
+from utils.conf import config
+import asyncio
 
-class Help(commands.Cog):
+reaction_emojis = config.get_reaction_emojis()
+reaction_patterns = {
+    r".*\b[Uu]pvote[sd]?\b.*": config.reaction_emojis['upvote'],
+    r".*\b[Gg]ood\b.*": config.reaction_emojis['upvote'],
+    r".*\b[Dd]ownvote[sd]?\b.*": config.reaction_emojis['downvote'],
+    r".*\b[Bb]ad\b.*": config.reaction_emojis['downvote'],
+    r".*\b[Nn]o\s*[yo]?u\b.*": config.reaction_emojis['noyou'],
+    r".*\b([Mm][Ee])\1*\b.*": config.reaction_emojis['moeji'],
+    r".*\b[Tt]hinks?[ing]?\b.*": config.reaction_emojis['think'],
+    r".*\b[Ww][OoWw]*\b.*": config.reaction_emojis['wow'],
+}
+
+class React(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.emojis = {}
 
-    @commands.command(name="help", help="Shows this message")
-    async def custom_help(self, ctx, *cog_names):
-        if not cog_names:
-            embed = discord.Embed(title="Help", description="List of available commands:", color=discord.Color.red())
-            embed.set_thumbnail(url=ctx.bot.user.avatar)
-            for cog_name, cog in self.bot.cogs.items():
-                if cog.get_commands():
-                    cog_commands = [f"`{command.name}`: {command.help or 'No description'}" for command in cog.get_commands()]
-                    embed.add_field(name=cog_name, value="\n".join(cog_commands), inline=False)
-            await ctx.send(embed=embed)
-        else:
-            for cog_name in cog_names:
-                cog = self.bot.get_cog(cog_name)
-                if cog:
-                    embed = discord.Embed(title=f"Help - {cog_name}", description=cog.__doc__, color=discord.Color.red())
-                    embed.set_thumbnail(url=ctx.bot.user.avatar)
-                    for command in cog.get_commands():
-                        embed.add_field(name=command.name, value=command.help or "No description", inline=False)
-                    await ctx.send(embed=embed)
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user or message.author.bot:
+            return
+
+        if message.content.startswith(self.bot.command_prefix):
+            return
+
+        if message.guild is None:
+            return
+
+        for pattern, emoji_id in reaction_patterns.items():
+            if re.search(pattern, message.content):
+                if emoji_id in self.emojis:
+                    emoji = self.emojis[emoji_id]
                 else:
-                    await ctx.send(f"No cog named `{cog_name}` found.")
-
-    @commands.command()
-    async def source(self, ctx):
-        """Link to Source Code."""
-        await ctx.send(f"{ctx.bot.user}'s source code: https://github.com/monk-afk/moe")
-
-    @commands.command()
-    async def moedc(self, ctx):
-        """Home Server Invite Link."""
-        await ctx.send(f"{ctx.bot.user}'s home is at SquareOne: https://discord.gg/pE4Tu3cf23")
+                    try:
+                        emoji = await self.bot.fetch_application_emoji(emoji_id)
+                        self.emojis[emoji_id] = emoji
+                    except Exception as e:
+                        print(f"Error fetching emoji: {e}")
+                        continue
+                try:
+                    await asyncio.sleep(2)
+                    await message.add_reaction(emoji)
+                except Exception as e:
+                    print(f"Error adding reaction: {e}")
 
 async def setup(bot):
-    await bot.add_cog(Help(bot))
-
+    await bot.add_cog(React(bot))
 
 
 

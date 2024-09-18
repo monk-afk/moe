@@ -2,7 +2,7 @@
 
 A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
 
-<img decoding="async" loading="lazy" alt="moe banner red and white pixelated letters" src="https://raw.githubusercontent.com/monk-afk/moe/images/rgb_32b_floatpt/squareone_moe_banner_style_680x240.png"  width="340"/>
+<img decoding="async" loading="lazy" alt="moe banner red and white pixelated letters" src="https://raw.githubusercontent.com/monk-afk/moe/docs/images/moe_banner_v3_680x240.png"  width="340"/>
 
 møe's official home is at the SquareOne Discord:
 
@@ -34,7 +34,7 @@ ___
   - To unset a reply channel, type: `m1 unsetreplychannel`
 
 - If a member needs extra attention, set a reply-to and møe will respond to their messages:
-  - In any channel, type: `m1 sayhello @user`
+  - In any channel, type: `m1 sayhi @user`
   - To stop the replies, type: `m1 saybye @user`
 
 - møe will remember the context of a conversation per-channel for up to ten messages:
@@ -48,12 +48,13 @@ ___
 
 ## Installation
 
-- Install script found in docs/install.sh
+- [Install steps](docs/install.sh)
+- Requires discord.py version 2.5.0 or higher
 - PostgreSQL database.
 - Python3 (tested with 3.11)
 - python3-venv for virtual environment
 - python3-pip for additional libraries and modules
-  - A list of required modules can be found in docs/requirements.txt
+  - [Required modules](docs/requirements.txt)
 
 ___
 
@@ -91,6 +92,8 @@ ___
 
 ## Changelog
 
+- 0.0.9
+  - Add Reaction emoji to messages with matching pattern
 - 0.0.8
   - Command prefix is now in the .env file
   - Add reply-to command

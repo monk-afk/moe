@@ -13,7 +13,7 @@ from utils.pgsql import (
 import asyncio
 
 patterns = {
-    "moe": r".*\b@?[M,m][o,ø]e\b.*",
+    "moe": r".*\b@?[Mm][oø]e\b.*",
     "bot": r".*\bbot\b.*",
 }
 
