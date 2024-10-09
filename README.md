@@ -92,6 +92,7 @@ ___
 
 ## Changelog
 
+- 0.0.10 Add command to reload cogs. Channel context tokens are actively updated instead of per reply.
 - 0.0.9
   - Add Reaction emoji to messages with matching pattern
 - 0.0.8

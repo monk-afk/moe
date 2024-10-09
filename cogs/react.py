@@ -12,7 +12,7 @@ reaction_patterns = {
     r".*\b[Dd]ownvote[sd]?\b.*": config.reaction_emojis['downvote'],
     r".*\b[Bb]ad\b.*": config.reaction_emojis['downvote'],
     r".*\b[Nn]o\s*[yo]?u\b.*": config.reaction_emojis['noyou'],
-    r".*\b([Mm][Ee])\1*\b.*": config.reaction_emojis['moeji'],
+    r".*\b([Mm][Ee])\1+\b.*": config.reaction_emojis['moeji'],
     r".*\b[Tt]hinks?[ing]?\b.*": config.reaction_emojis['think'],
     r".*\b[Ww][OoWw]*\b.*": config.reaction_emojis['wow'],
 }

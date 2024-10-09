@@ -34,8 +34,8 @@ class Help(commands.Cog):
         await ctx.send(f"{ctx.bot.user}'s source code: https://github.com/monk-afk/moe")
 
     @commands.command()
-    async def moedc(self, ctx):
-        """Home Server Invite Link."""
+    async def squareone(self, ctx):
+        """SquareOne Discord Invite Link."""
         await ctx.send(f"{ctx.bot.user}'s home is at SquareOne: https://discord.gg/pE4Tu3cf23")
 
 async def setup(bot):

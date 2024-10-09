@@ -15,6 +15,8 @@ import asyncio
 patterns = {
     "moe": r".*\b@?[Mm][oø]e\b.*",
     "bot": r".*\bbot\b.*",
+    "molo": r".*\b[Mm][Oo][Ll][Oo]+\b.*",
+    "monk": r".*\b@?[Mm][oø][Nn][Kk]+\b.*",
 }
 
 class Chat(commands.Cog):
@@ -43,20 +45,27 @@ class Chat(commands.Cog):
         guild_id = message.guild.id
         reply_channel = get_reply_channel(guild_id)
 
-        if channel_id == reply_channel or any(re.match(pattern, message.content.lower()) for pattern in patterns.values()) or check_reply_to(message.author.id):
-            self.processing_channel[channel_id] = True 
-            asyncio.create_task(self.processor(message))
+        if (
+            channel_id == reply_channel
+            or any(re.match(pattern, message.content.lower()) for pattern in patterns.values())
+            or check_reply_to(message.author.id)
+        ):
+            self.processing_channel[channel_id] = True
+            asyncio.create_task(self.processor(message, reply_channel))
 
-    async def processor(self, message):
+    async def processor(self, message, reply_channel):
         channel_id = message.channel.id
-        typing_task = asyncio.create_task(self.send_typing(message.channel))
+        input_tokens = await self.generate_tokens_from_message(message)
+
         try:
-            await self.generate_response(message)
+            typing_task = asyncio.create_task(self.send_typing(message.channel))
+            await self.generate_response(message, input_tokens)
+
         finally:
             typing_task.cancel()
             del self.processing_channel[channel_id]
 
-    async def generate_response(self, message):
+    async def generate_tokens_from_message(self, message):
         channel_id = message.channel.id
         guild_id = message.guild.id
         saved_input_ids = get_channel_input_ids(channel_id)
@@ -77,10 +86,18 @@ class Chat(commands.Cog):
                 break
             final_saved_input_ids.insert(0, token)
 
-        set_channel_input_ids(channel_id, guild_id, final_saved_input_ids)
-        bot_input_ids = torch.tensor(final_saved_input_ids).unsqueeze(0)
+        return final_saved_input_ids
 
+    async def generate_response(self, message, final_saved_input_ids):
+        channel_id = message.channel.id
+        guild_id = message.guild.id
+
+        set_channel_input_ids(channel_id, guild_id, final_saved_input_ids)
+
+        bot_input_ids = torch.tensor(final_saved_input_ids).unsqueeze(0)
+        
         attention_mask = torch.ones_like(bot_input_ids)
+
         chat_history_ids = self.model.generate(
             bot_input_ids,
             min_length = 10,
@@ -95,6 +112,7 @@ class Chat(commands.Cog):
         )
 
         response = self.tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+
         await asyncio.sleep(5)
         await message.channel.send(response)
 

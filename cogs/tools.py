@@ -52,7 +52,7 @@ class Tools(commands.Cog):
         """Unset the reply channel for the guild."""
         guild_id = ctx.guild.id
         drop_reply_channel(guild_id)
-        await ctx.send("Reply channel unset. I will still reply if you call my name.")
+        await ctx.send("Reply channel unset.")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -68,6 +68,14 @@ class Tools(commands.Cog):
         drop_reply_to(user.id)
         await ctx.send(f"Bye {user.name}!")
 
+    @commands.command(name="reload", hidden=True)
+    @commands.is_owner()
+    async def reload(self, ctx, extension: str):
+        try:
+            await self.bot.reload_extension(f"cogs.{extension}")
+            await ctx.send(f"Reloaded `{extension}` successfully!")
+        except Exception as e:
+            await ctx.send(f"Failed to reload `{extension}`: {e}")
 
 async def setup(bot):
     await bot.add_cog(Tools(bot))
