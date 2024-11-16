@@ -92,7 +92,12 @@ ___
 
 ## Changelog
 
-- 0.0.10 Add command to reload cogs. Channel context tokens are actively updated instead of per reply.
+- 0.0.11
+  - Truncate user input exceeding 100 words
+  - Limit input tokens by number eos token or input tokens, whichever hits the limit first
+- 0.0.10
+  - Add command to reload cogs
+  - Channel context tokens are actively updated instead of per reply
 - 0.0.9
   - Add Reaction emoji to messages with matching pattern
 - 0.0.8
