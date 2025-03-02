@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective Date: July 18, 2024
+Effective Date: March 2, 2025
 
 ## Introduction
 
@@ -14,7 +14,7 @@ We do not collect personally identifiable information from users through the Cha
 
 ### Non-Personal Information
 
-We may collect and temporarily store non-personal information about users whenever they interact with the Chatbot. This information is limited to chat messages, Guild ID, and Discord User ID. Messages contatining the Chatbot's name, messages sent within the designated reply channel. The contents of the messages are stored as encoded tensors, and are not readable without Tensor decoding software.
+We collect and temporarily store non-personal information about users. This information is collected whenever a user interacts with the Chatbot within a Discord guild, in channels accessible to the Chatbot. This information is limited to chat messages, the Guild ID where the interaction takes place, and Discord ID of the User. The contents of the messages are stored as encoded tensors, and are not readable without Tensor decoding software.
 
 ## How We Use Your Information
 
@@ -24,11 +24,15 @@ We may use non-personal information collected from users to:
 - Monitor the usage of the Chatbot for technical purposes.
 - Provide technical support and respond to user inquiries.
 
-Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) messages are stored per channel, reply channel.
+## Retention of Your Information
+
+Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) encoded messages containing no more than a combined total of 500 word tokens are stored per guild.
 
 You may request deletion of these messages by using the commands included with the Chatbot, which can be found using the Chatbot's help command.
 
-Any stored messages associated with a Guild are automatically deleted when the Chatbot is removed from the Guild.
+Guild members with granted privilege may also delete the Chatbot's stored data per-user or the entire guild.
+
+All stored information associated with a Guild is automatically deleted when the Chatbot is removed from the Guild.
 
 ## Disclosure of Your Information
 

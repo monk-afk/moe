@@ -11,7 +11,7 @@ CMD_PREFIX=m1
 # CMD_PREFIX=m2
 
 # GLOBAL (production or testing)
-# Emoji IDs, replace with your own or use these ones
+# Emoji IDs, replace with your own
 UPVOTE_EMOJI=1263660414860787783
 DOWNVOTE_EMOJI=1263660445101985832
 NOYOU_EMOJI=1285461086149148712

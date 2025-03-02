@@ -10,72 +10,67 @@ from utils.pgsql import (
     set_reply_channel,
     get_reply_channel,
     drop_reply_channel,
-    get_channel_input_ids,
-    set_channel_input_ids,
-    drop_channel_input_ids
-    # get_user_input_ids,
-    # set_user_input_ids,
-    # drop_user_input_ids,
+    drop_guild_data,
+    set_input_ids,
+    get_input_ids,
+    drop_input_ids,
+    set_reply_to,
+    check_reply_to
 )
 
 def test_create_drop_tables():
+    guild_id = 9876543210
+    user_id = 1234567890
+    channel_id = 6758493021
+    input_ids = [1, 2, 3, 4, 5]
+
     try:
         drop_all_tables()
-        print("Tables dropped")
         create_tables()
-        print("Tables created")
-
-        test_reply_channel()
-        test_channel_input_ids()
-        # test_user_input_ids()
-
+        test_input_ids(guild_id, user_id, input_ids)
+        test_reply_channel(guild_id, channel_id)
+        test_reply_to(guild_id, user_id)
+        drop_guild_data(guild_id)
         drop_all_tables()
-        print("Tables dropped")
+
     except Exception as e:
         print(f"Error in create/drop tables: {e}")
 
-def test_reply_channel():
+def test_reply_channel(guild_id, channel_id):
     try:
-        set_reply_channel(123456789, 987654321)
-        reply_channel = get_reply_channel(123456789)
-        if reply_channel == 987654321:
-            print("Set and fetched reply channel")
-            drop_reply_channel(123456789)
-            print("Dropped reply channel")
+        set_reply_channel(guild_id, channel_id)
+        reply_channel = get_reply_channel(guild_id)
+        if reply_channel == channel_id:
+            drop_reply_channel(channel_id)
         else:
-            print("Mismatch in set and fetched reply channel")
+            print(f"ERROR {reply_channel} == {channel_id}")
     except Exception as e:
-        print(f"Error in set/get reply channel: {e}")
+        print(f"CAUGHT EXCEPTION {e}")
 
-def test_channel_input_ids():
+def test_input_ids(guild_id, user_id, input_ids):
     try:
-        set_channel_input_ids(987654321, 123456789, [1, 2, 3, 4, 5])
-        input_ids = get_channel_input_ids(987654321)
-        if input_ids == [1, 2, 3, 4, 5]:
-            print("Set and fetched channel bot input IDs")
-            drop_channel_input_ids(987654321)
-            print("Dropped channel bot input IDs")
+        set_input_ids(guild_id, user_id, input_ids)
+        received = get_input_ids(guild_id, user_id)
+        if received == input_ids:
+            drop_input_ids(user_id)
         else:
-            print("Mismatch in set and fetched channel bot input IDs")
+            print(f"ERROR {received} == {input_ids}")
     except Exception as e:
-        print(f"Error in set/get channel bot input IDs: {e}")
+        print(f"Error in set/get input IDs: {e}")
 
-# def test_user_input_ids():
-#     try:
-#         set_user_input_ids(111222333, [10, 20, 30])
-#         input_ids = get_user_input_ids(111222333)
-#         if input_ids == [10, 20, 30]:
-#             print("Set and fetched user bot input IDs")
-#             drop_user_input_ids(111222333)
-#             print("Dropped user bot input IDs")
-#         else:
-#             print("Mismatch in set and fetched user bot input IDs")
-#     except Exception as e:
-#         print(f"Error in set/get user bot input IDs: {e}")
+def test_reply_to(guild_id, user_id):
+    try:
+        set_reply_to(guild_id, user_id, True)
+        reply_to = check_reply_to(guild_id, user_id)
+        if reply_to is True:
+            set_reply_to(guild_id, user_id, False)
+        else:
+            print(f"ERROR reply_to is True")
+    except Exception as e:
+        print(f"CAUGHT {e}")
 
 if __name__ == "__main__":
     test_create_drop_tables()
-
 
 
 ####################################################################################

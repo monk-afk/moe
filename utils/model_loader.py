@@ -1,31 +1,23 @@
-import sys
-import time
+# utils/model_loader.py
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from utils.logroll import logging
 log = logging.getLogger(__name__)
-import signal
 
-log.info(f"Initializing moe")
+class ModelLoader:
+    def __init__(self):
+        self.model_name = "microsoft/DialoGPT-large"
+        self.tokenizer = None
+        self.model = None
 
-def handle_signal(sig, frame):
-    log.info('Received shutdown signal. Exiting...')
-    sys.exit(0)
+    def load_model_and_tokenizer(self):
+        if self.model is None or self.tokenizer is None:
+            self.tokenizer = GPT2Tokenizer.from_pretrained(self.model_name)
+            self.model = GPT2LMHeadModel.from_pretrained(self.model_name)
+            log.info(f"OK load_model: {self.model_name}")
 
-def main():
-    signal.signal(signal.SIGINT, handle_signal)
-    signal.signal(signal.SIGTERM, handle_signal)
+        return self.model, self.tokenizer
 
-    from utils.bot import run_bot
-
-    while True:
-        try:
-            run_bot()
-        except Exception as e:
-            log.error(f'Bot process crashed with error: {e}')
-            log.warning('Restarting bot process...')
-            time.sleep(5)
-
-if __name__ == '__main__':
-    main()
+model_loader = ModelLoader()
 
 
 
