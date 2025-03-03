@@ -1,7 +1,19 @@
 # Changelog
 
-## [0.1.0] - 2025-03-01
+[0.1.1] - 2025-03-03
+  - Fix typing indicator appearing after message is sent
+    - Added a slight random delay before typing
+    - Fallback method included in comment
+  - Remove leftover import transformers statement
+  - Move command prefix check before assigning variables
+  - Adjusted token limits:
+    - Maximum 30 words from new messages
+    - Truncate old messages to 100 tokens or 12 EOS tokens
+  - Adjust output generate parameters for better responses
+  - Add no_repeat_ngram_size parameter
+  - Append model's output to the user's token history
 
+[0.1.0] - 2025-03-01
   - Update to **[Privacy Policy](docs/Privacy_Policy.md)**
   - Remove per-channel and introduce per-user conversation history
   - Command for users to delete their conversation history with the Chatbot

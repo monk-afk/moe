@@ -65,7 +65,7 @@ ___
 
 ___
 
-**[Changelog](CHANGELOG.md)**
+**[Changelog](docs/CHANGELOG.md)**
 
 **[Terms of Service](docs/Terms_of_Service.md)**
 
