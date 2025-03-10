@@ -7,14 +7,15 @@ from logging.handlers import RotatingFileHandler
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
+# MIT Copyright (c) 2015-present Rapptz
 log_handler = RotatingFileHandler(
     os.path.join('logs', 'debug.log'),
     maxBytes = 32 * 1024 * 1024,  # 32 MiB
     backupCount = 5,  # Rotate through 5 files
     encoding = 'utf-8'
-)
+)   # https://discordpy.readthedocs.io/en/latest/logging.html#logging-setup 
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     handlers=[log_handler],
                     format='%(asctime)s: %(name)s[%(levelname)s]: %(message)s')
 

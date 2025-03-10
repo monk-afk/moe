@@ -3,7 +3,10 @@ import discord
 from discord.ext import commands
 from utils.logroll import logging
 log = logging.getLogger(__name__)
-from utils.pgsql import drop_guild_data
+from utils.nosj import (
+  drop_guild,
+  set_key
+)
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -24,8 +27,12 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        drop_guild_data(guild.id)
+        await drop_guild(guild.id)
         log.info(f'Removed from guild: {guild.name}')
+
+    @commands.Cog.listener()
+    async def on_raw_member_remove(self, payload):
+        await set_key(payload.guild_id, payload.User.id, "input_tokens", [])
 
 async def setup(bot):
     await bot.add_cog(Events(bot))

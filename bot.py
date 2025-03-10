@@ -1,8 +1,10 @@
 # utils/bot.py
 import os
+import asyncio
 import discord
 from discord.ext import commands
 from utils.conf import config
+from utils.nosj import load_file_data
 from utils.logroll import logging
 log = logging.getLogger(__name__)
 
@@ -14,34 +16,36 @@ class moeBot(commands.Bot):
         super().__init__(command_prefix=config.discord_prefix, intents=intents)
         self.config = config
 
-    async def on_ready(self):
-        log.info(f'Logged in as {self.user}')
+    async def setup_hook(self):
         await self.load_cogs()
 
     async def load_cogs(self):
-        cogs_dir = os.path.join(os.path.dirname(__file__), '..', 'cogs')
+        """Loads all cogs from the cogs folder."""
+        cogs_dir = os.path.join(os.path.dirname(__file__), "cogs")
         for filename in os.listdir(cogs_dir):
-            if filename.endswith('.py'):
-                cog_name = f'cogs.{filename[:-3]}'
+            if filename.endswith(".py"):
+                cog_name = f"cogs.{filename[:-3]}"
                 try:
                     await self.load_extension(cog_name)
-                    log.info(f'Loaded cog: {cog_name}')
+                    log.info(f"Loaded cog: {cog_name}")
                 except Exception as e:
-                    log.error(f'Failed to load cog {cog_name}: {str(e)}')
-        log.info(f'Bot is ready. Logged in as {self.user.name}')
+                    log.error(f"Failed to load cog {cog_name}: {e}")
+        log.info(f"Bot is ready. Logged in as {self.user.name}")
 
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
-            await ctx.send('Command not found.')
+            await ctx.send("Command not found.")
 
-def run_bot():
+async def run_bot():
+    log.info("Initializing...")
     bot = moeBot(config)
-    bot.remove_command('help')
-    bot.run(config.discord_token)
+    bot.remove_command("help")
+    await load_file_data()
+    async with bot:
+        await bot.start(config.discord_token)
 
-if __name__ == '__main__':
-    run_bot()
-
+if __name__ == "__main__":
+    asyncio.run(run_bot())
 
 
 

@@ -7,7 +7,6 @@ import asyncio
 from utils.logroll import logging
 log = logging.getLogger(__name__)
 
-reaction_emojis = config.get_reaction_emojis()
 reaction_patterns = {
     r".*\b[Uu]pvote[sd]?\b.*":   config.reaction_emojis['upvote'],
     r".*\b[Gg]ood\b.*":          config.reaction_emojis['upvote'],
@@ -37,9 +36,13 @@ class React(commands.Cog):
 
         for pattern, emoji_id in reaction_patterns.items():
             if re.search(pattern, message.content):
-                if emoji_id in self.emojis:
-                    emoji = self.emojis[emoji_id]
-                else:
+                if not emoji_id:
+                    log.warning(f"emoji_id not found: {pattern}")
+                    continue
+
+                emoji = self.emojis.get(emoji_id)
+
+                if emoji is None:
                     try:
                         emoji = await self.bot.fetch_application_emoji(emoji_id)
                         self.emojis[emoji_id] = emoji

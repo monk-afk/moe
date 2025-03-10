@@ -1,5 +1,30 @@
 # Changelog
 
+#### 0.2.0
+
+[0.2.0] - 2025-03-10
+  - Removed PostgreSQL dependency
+  - Implement storage using JSON file
+  - Fixed trying to fetch_application_emoji from non-existent emoji
+  - Refuse sending empty messages
+  - Save to file on shutdown
+  - Update `install.sh`
+    - Creates `run_bot.sh`
+  - Cleaned up all the files
+  - Add commands:
+    - `shutdown` to softly put moe to sleep
+    - `chatlogs` to give the user their decoded chat history
+    - `dumpbackend` to dump raw memory to logs for debugging
+  - Move model and tokenizer into own untils file
+  - Tweak response generation parameters slightly
+  - Initialize from bot.py instead of init.py
+  - Drop user chat history on leave guild event
+
+___
+___
+
+#### 0.1.0
+
 [0.1.1] - 2025-03-03
   - Fix typing indicator appearing after message is sent
     - Added a slight random delay before typing
@@ -33,6 +58,8 @@
 ___
 ___
 
+#### 0.0.0
+
 0.0.11 - 2024-11-16
   - Truncate user input exceeding 100 words
   - Limit input tokens by number eos token or input tokens, whichever hits the limit first
@@ -50,26 +77,26 @@ ___
 
 0.0.7
   - Tidy reply conditional
-  - ~~Add reply referencing [#7](https://github.com/monk-afk/moe/issues/7)~~ Removed
+  - ~~Add reply referencing~~ rolled back
 
 0.0.6
-  - Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)
+  - Fix typing indicator bug
 
 0.0.5
   - Properly formatted help message
-  - ~~Fix typing indicator bug [#3](https://github.com/monk-afk/moe/issues/3)~~
-  - Fix errors on Guild removal [#5](https://github.com/monk-afk/moe/issues/5)
+  - Fix typing indicator bug
+  - Fix errors on Guild removal
 
 0.0.4
   - Ignore direct messages
   - bugfix trailing eos token
 
 0.0.3
-  - bugfix for context saving [#2](https://github.com/monk-afk/moe/issues/2)
+  - bugfix for context saving
 
 0.0.2
   - Save channel/guild contexts separately
-  - Concurrent message processing [#1](https://github.com/monk-afk/moe/issues/1)
+  - Concurrent message processing
   - Purge guild data when bot is removed from guild
 
 0.0.1

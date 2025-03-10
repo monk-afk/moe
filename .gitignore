@@ -1,6 +1,10 @@
 *.env
 *.swp
 *.tmp
+*_py
+*.json
+*.sh
+
 __pycache__/
 logs/
 pyven/

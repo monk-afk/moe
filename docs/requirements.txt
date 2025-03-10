@@ -1,1 +1,0 @@
-pip wheel py-dotenv psycopg2-binary discord.py transformers torch

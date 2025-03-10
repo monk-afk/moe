@@ -4,16 +4,17 @@ import re
 import random
 from discord.ext import commands
 import torch
-from utils.pgsql import (
+from utils.nosj import (
     get_reply_channel,
-    get_input_ids,
-    set_input_ids,
-    check_reply_to
+    get_input_tokens,
+    set_key,
+    get_reply_to
 )
 import asyncio
 from utils.logroll import logging
 log = logging.getLogger(__name__)
-from utils.model_loader import model_loader
+
+from utils.dialogpt import dialogpt
 
 response_triggers = {
     "moe": r".*\b@?[Mm][oø]e\b.*",
@@ -26,7 +27,8 @@ class Chat(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.processing_channel = {}
-        self.model, self.tokenizer = model_loader.load_model_and_tokenizer()
+        self.model = dialogpt.load_model()
+        self.tokenizer = dialogpt.load_tokenizer()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -42,7 +44,7 @@ class Chat(commands.Cog):
         if channel_id in self.processing_channel:  # process only one message per channel
             return
 
-        reply_channel = get_reply_channel(guild_id)
+        reply_channel = await get_reply_channel(guild_id)
 
         if (
             message.author == self.bot.user  # don't reply to self
@@ -54,13 +56,12 @@ class Chat(commands.Cog):
         if (
             channel_id == reply_channel
             or any(re.match(pattern, message.content.lower()) for pattern in response_triggers.values())
-            or check_reply_to(guild_id, message.author.id)
+            or await get_reply_to(guild_id, message.author.id)
         ):
             self.processing_channel[channel_id] = True  # to avoid queuing message processing in a single channel
             asyncio.create_task(self.processor(message))
 
     async def processor(self, message):
-        channel_id = message.channel.id
         input_tokens = await self.generate_tokens_from_message(message)
 
         try:
@@ -71,10 +72,10 @@ class Chat(commands.Cog):
             pass
 
         finally:
-            del self.processing_channel[channel_id]
+            del self.processing_channel[message.channel.id]
 
     async def generate_tokens_from_message(self, message):
-        saved_input_ids = get_input_ids(message.guild.id, message.author.id) # get user chat history
+        saved_input_ids = await get_input_tokens(message.guild.id, message.author.id) # get user chat history
 
         message_content = ' '.join(message.content.split()[:30]) # limit input 30 words from message
 
@@ -103,7 +104,7 @@ class Chat(commands.Cog):
         return final_saved_input_ids
 
     async def generate_response(self, message, final_saved_input_ids):
-        await asyncio.sleep(random.uniform(1.2, 3.4))  # delay typing
+        await asyncio.sleep(random.uniform(2.2, 3.8))  # delay typing
 
         async with message.channel.typing():
             bot_input_ids = torch.tensor(final_saved_input_ids).unsqueeze(0)
@@ -116,24 +117,25 @@ class Chat(commands.Cog):
                 max_length = 1000,
                 pad_token_id = self.tokenizer.eos_token_id,
                 attention_mask = attention_mask,
+                repetition_penalty = 1.0,
                 do_sample = True,
-                # adjusting these three causes the most noticeable change to responses
-                top_k = 100,               # limits the number of tokens considered
-                top_p = 0.89,              # smallest set of tokens whose total probability adds up to
-                temperature = 0.92,        # lower temp outputs more predictably, high temp more varied and creative
-                no_repeat_ngram_size = 2,  # prevents repeating words too often, 3 is more strict
-                repetition_penalty = 1.0
+                # adjusting these causes the most noticeable change to responses
+                top_k = 65,                # limits the number of tokens considered
+                top_p = 0.78,              # smallest set of tokens whose total probability adds up to
+                temperature = 0.93,        # lower temp outputs more predictably, high temp more varied and creative
+                no_repeat_ngram_size = 2  # prevents repeating words too often, 3 is more strict
             )
 
             response = self.tokenizer.decode(response_tokens[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
 
+            if not response.strip():
+                log.warning(f"Refused empty message: {message}")
+                return
+
             final_saved_input_ids += self.tokenizer.encode(response + self.tokenizer.eos_token)
-
-            set_input_ids(message.guild.id, message.author.id, final_saved_input_ids)
-
-            # # Incase there are issues with generating too quickly, this can be a fallback method:
+            await set_key(message.guild.id, message.author.id, "input_tokens", final_saved_input_ids)
             # estimated_words = len(response_tokens[0])
-            # typing_time = min(4, max(1, estimated_words / 4))
+            # typing_time = min(6, max(1, estimated_words / 4.5))
             # await asyncio.sleep(typing_time)
         await message.channel.send(response)
 

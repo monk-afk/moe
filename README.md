@@ -2,7 +2,7 @@
 
 A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
 
-<img decoding="async" loading="lazy" alt="moe banner red and white pixelated letters" src="https://raw.githubusercontent.com/monk-afk/moe/main/docs/images/moe_banner_v3_680x240.png"  width="340"/>
+<img decoding="async" loading="lazy" alt="moe banner red and white pixelated letters" src="https://raw.githubusercontent.com/monk-afk/moe/main/images/moe_banner_v3_680x240.png"  width="340"/>
 
 møe's official home is at the SquareOne Discord:
 
@@ -12,36 +12,13 @@ ___
 
 ## Features
 
-- Casual Conversational AI Language Model, Powered by [DialoGPT, courtesy of Huggingface](https://huggingface.co/docs/transformers/main/en/model_doc/dialogpt)
+- Casual Conversational AI Language Model, Powered by [DialoGPT, courtesy of Huggingface](https://huggingface.co/docs/transformers/main/en/model_doc/dialogpt) - [docs](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/text_generation#transformers.GenerationConfig)
 
-- Response triggers from regex pattern keyword detection
+- Response triggers: "moe", "bot", "monk", "molo"
 
 - Designated Reply-to Channel allows møe to reply freely with guild Members
 
 - Always-reply-to enables møe to always respond to specified Users in any channel
-
-___
-
-## Commands
-
-The command prefix must be set in the .env file.
-
-> `command`(privilege): deatils of command
-
-- Response triggers: "moe", "bot", "monk", "molo" ([chat.py](/cogs/chat.py))
-- `setreplychannel`(administrator): set or overwrite reply channel to focused channel
-- `unsetreplychannel`(administrator): unset reply channel
-- `sayhi @mention`(administrator): set reply-to user in any channel
-- `saybye @mention`(administrator): remove reply-to user
-- `forgetme`(send_messages): erase møe's memory of your conversation
-- `forgetuser @mention_member`(manage_messages): erase møe's memory of the mentioned user
-- `forgetguild`(administrator): erase møe's conversation memory for the entire guild
-- `ping`(send_messages): test latency
-- `reload [cogs name]`(owner): reload a cogs module
-- `rebuild`(owner): rebuild the database
-- `help`(send_messages): list all commands
-- `source`(send_messages): get the link to møe's repository
-- `squareone`(send_messages): get the invite link to møe's home Discord server
 
 ___
 
@@ -50,26 +27,59 @@ ___
 - Memory Requirements:
   - 6GB RAM
   - 5GB Disk
-- PostgreSQL database with localhost socket connection.
+
+- [Install Script](install.sh)
+  - Requires Linux Bash
+
 - Python3 (3.8 or higher. tested with 3.11)
   - python3-venv (Python Virtual Environment)
-  - python3-pip and [modules](docs/requirements.txt):
+  - python3-pip (Python Package Installer):
     - transformers (Provides HuggingFace AI Model)
     - torch (Message tensor encoding)
     - wheel (Replaces pip-deprecated setup.py)
-    - py-dotenv ([Environment Variables](docs/example_env))
+    - py-dotenv (Environment Variables)
     - discord.py (version 2.5.0 or higher)
-    - psycopg2-binary (Database Management)
-- [Install steps](docs/install.sh)
-- [Response Generation Parameters](/docs/info.md)
 
 ___
 
-**[Changelog](docs/CHANGELOG.md)**
+## Commands
 
-**[Terms of Service](docs/Terms_of_Service.md)**
+The command prefix default is `m1`, as set in the .env file.
 
-**[Privacy Policy](docs/Privacy_Policy.md)**
+> `command`(privilege): deatils of command
+
+- `chatlogs`(send_messages): show your conversation history
+- `forgetme`(send_messages): erase møe's memory of your conversation
+- `ping`(send_messages): test latency
+- `help`(send_messages): list all commands
+- `source`(send_messages): get the link to møe's repository
+- `squareone`(send_messages): get the invite link to møe's home Discord server
+
+- `forgetuser @mention_member`(manage_messages): erase møe's memory of the mentioned user
+- `setreplychannel`(administrator): set or overwrite reply channel to focused channel
+- `unsetreplychannel`(administrator): unset reply channel
+- `sayhi @mention`(administrator): set reply-to user in any channel
+- `saybye @mention`(administrator): remove reply-to user
+- `forgetguild`(administrator): erase møe's conversation memory for the entire guild
+
+- `rebuild`(owner): rebuild the database
+- `reload [cogs name]`(owner): reload a cogs module
+- `shutdown`(owner): send the shutdown signal for graceful termination
+- `dumpbackend`(owner): dump the raw memory to debug.txt
+
+___
+
+## Troubleshoot
+
+- ToDo
+
+___
+
+**[Changelog](CHANGELOG.md)**
+
+**[Terms of Service](Terms_of_Service.md)**
+
+**[Privacy Policy](Privacy_Policy.md)**
 
 ___
 

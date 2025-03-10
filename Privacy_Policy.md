@@ -26,7 +26,7 @@ We may use non-personal information collected from users to:
 
 ## Retention of Your Information
 
-Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (10) encoded messages containing no more than a combined total of 500 word tokens are stored per guild.
+Stored messages are automatically rotated during a user's interaction with the Chatbot. A maximum of ten (12) encoded messages containing no more than a combined total of 100 word tokens are stored per user. These encoded messages are deleted automatically when a guild member is removed from the guild.
 
 You may request deletion of these messages by using the commands included with the Chatbot, which can be found using the Chatbot's help command.
 
