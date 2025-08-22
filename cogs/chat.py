@@ -29,6 +29,11 @@ class Chat(commands.Cog):
         self.processing_channel = {}
         self.model = dialogpt.load_model()
         self.tokenizer = dialogpt.load_tokenizer()
+        self.bad_words_ids = self.get_blacklisted()
+
+    def get_blacklisted(self): # will refuse to say words on the blacklist
+        bad_words_ids = [self.tokenizer(word, add_prefix_space=True).input_ids for word in dialogpt.blacklist]
+        return bad_words_ids
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -117,32 +122,28 @@ class Chat(commands.Cog):
                 max_length = 1000,
                 pad_token_id = self.tokenizer.eos_token_id,
                 attention_mask = attention_mask,
+                bad_words_ids = self.bad_words_ids,
                 repetition_penalty = 1.0,
                 do_sample = True,
                 # adjusting these causes the most noticeable change to responses
-                top_k = 65,                # limits the number of tokens considered
-                top_p = 0.78,              # smallest set of tokens whose total probability adds up to
-                temperature = 0.93,        # lower temp outputs more predictably, high temp more varied and creative
-                no_repeat_ngram_size = 2  # prevents repeating words too often, 3 is more strict
+                top_k = 85,                # limits the number of tokens considered
+                top_p = 0.95,              # smallest set of tokens whose total probability adds up to
+                temperature = 0.81,        # lower temp outputs more predictably, high temp more varied and creative
+                no_repeat_ngram_size = 2   # prevents repeating words too often, 3 is more strict
             )
 
             response = self.tokenizer.decode(response_tokens[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
 
             if not response.strip():
-                log.warning(f"Refused empty message: {message}")
-                return
+                log.warning(f"Refused sending empty message, retrying")
+                return self.generate_response(message, final_saved_input_ids)
 
             final_saved_input_ids += self.tokenizer.encode(response + self.tokenizer.eos_token)
             await set_key(message.guild.id, message.author.id, "input_tokens", final_saved_input_ids)
-            # estimated_words = len(response_tokens[0])
-            # typing_time = min(6, max(1, estimated_words / 4.5))
-            # await asyncio.sleep(typing_time)
         await message.channel.send(response)
 
 async def setup(bot):
     await bot.add_cog(Chat(bot))
-
-
 
 ######################################################################################
 ##  MIT License                                                                     ##
