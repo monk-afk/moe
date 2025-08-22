@@ -2,6 +2,14 @@
 
 #### 0.2.0
 
+[0.2.1] - 2025-08-21
+  - Fix issue [#11](https://github.com/monk-afk/moe/issues/11)
+  - Implement [#12](https://github.com/monk-afk/moe/issues/12)
+  - Add blacklist to response generator
+  - Retry sending new message if last response was empty
+  - Removed some unused code blocks and fixed typos
+  - Tweaked response generation parameters again
+
 [0.2.0] - 2025-03-10
   - Removed PostgreSQL dependency
   - Implement storage using JSON file

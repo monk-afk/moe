@@ -6,9 +6,12 @@ log = logging.getLogger(__name__)
 
 class DialoGPT:
     def __init__(self):
-        self.model_name = "microsoft/DialoGPT-large"
+        self.model_name = "microsoft/DialoGPT-medium"
         self.tokenizer = None
         self.model = None
+        self.blacklist = {
+            "fuck",  # add blacklisted words
+        }
         log.info(f"Initializing GPT model: {self.model_name}")
 
     def load_tokenizer(self):

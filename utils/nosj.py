@@ -6,6 +6,22 @@ log = logging.getLogger(__name__)
 file_lock = asyncio.Lock()
 data = {}
 
+# JSON tables are string keys, we need integers
+def convert_keys_to_int(d):
+    if isinstance(d, dict):
+        new = {}
+        for k, v in d.items():
+            try:
+                ik = int(k)
+            except ValueError:
+                ik = k  # leave non-numeric keys as-is
+            new[ik] = convert_keys_to_int(v)
+        return new
+    elif isinstance(d, list):
+        return [convert_keys_to_int(i) for i in d]
+    else:
+        return d
+
 # File management
 async def load_file_data():
     global data
@@ -14,6 +30,7 @@ async def load_file_data():
             with open("moe_data.json", "r") as f:
                 loaded_data = json.load(f)
                 if isinstance(loaded_data, dict):
+                    loaded_data = convert_keys_to_int(loaded_data)
                     data.update(loaded_data)
                 log.info("Loaded data from file.")
     except (FileNotFoundError, json.JSONDecodeError):
@@ -34,14 +51,6 @@ async def reset_file_data():
     log.info("Reset global data file.")
     data = {}
     await save_file_data()
-
-# to create non-existing tables
-def create_table_not_in_data(guild, user=None):
-    if guild not in data:
-        data[guild] = {"reply_channel": None, "users": {}}
-
-    if user is not None and user not in data[guild]["users"]:
-        data[guild]["users"][user] = {"reply_to": False, "input_tokens": []}
 
 # Set or remove keys from table
 async def set_key(guild, user, key, value):
@@ -64,6 +73,9 @@ async def set_key(guild, user, key, value):
             data[guild]["users"][user] = {"reply_to": False, "input_tokens": []}
         data[guild]["users"][user][key] = value
 
+    await save_file_data()
+
+
 # These could be like set_key,
 async def get_reply_channel(guild):
     return data.get(guild, {}).get("reply_channel", None)
@@ -78,23 +90,22 @@ async def get_reply_to(guild, user):
 async def drop_guild(guild):
     if guild in data:
         data.pop(guild)
+        await save_file_data()
         log.info(f"OK drop_data({guild})")
-    await save_file_data()
 
 # drop all user tokens in a single guild
 async def drop_guild_input_tokens(guild):
     if guild in data and "users" in data[guild]:
         for user in list(data[guild]["users"].keys()):
-            await set_input_tokens(guild, user, "input_tokens", [])
+            await set_key(guild, user, "input_tokens", [])
         log.info(f"OK drop_guild_input_tokens({guild})")
 
 # drop user tokens across all guilds (not implemented yet)
 async def drop_user_input_tokens(user): 
     for guild in list(data.keys()):
         if "users" in data[guild] and user in data[guild]["users"]:
-            await set_input_tokens(guild, user, tokens=None)
+            await set_key(guild, user, tokens=None)
     log.info(f"OK drop_user_input_tokens({user})")
-
 
 
 ######################################################################################

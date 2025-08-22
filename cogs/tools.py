@@ -2,6 +2,7 @@
 import discord
 from discord.ext import commands
 from utils.dialogpt import dialogpt
+from datetime import datetime
 from utils.nosj import (
   get_input_tokens,
   set_key
@@ -20,13 +21,22 @@ class Tools(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(send_messages=True)
+    async def time(self, ctx):
+        """Get the current time."""
+        timenow = datetime.now()
+        timefmt = timenow.strftime("%B %d, %Y at %H:%M")
+        timeunix = timenow.strftime("%s")
+        await ctx.send(f"Server time: {timefmt}\nLocal time: <t:{timeunix}:f>")
+
+    @commands.command()
+    @commands.has_permissions(send_messages=True)
     async def forgetme(self, ctx):
         """Erase your chat history from møe's memory"""
         try:
             await set_key(ctx.guild.id, ctx.author.id, "input_tokens", [])
             await ctx.send(f"I have no memory of {ctx.author.mention}!")
         except Exception as e:
-            await log.warning(f"Could forget user: {e}")
+            await log.warning(f"Could not forget user: {e}")
 
     @commands.command()
     @commands.has_permissions(send_messages=True)
