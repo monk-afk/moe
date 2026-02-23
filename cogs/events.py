@@ -32,17 +32,21 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_member_remove(self, payload):
-        await set_key(payload.guild_id, payload.User.id, "input_tokens", [])
+        user = getattr(payload, "user", None)
+        user_id = getattr(user, "id", None) or getattr(payload, "user_id", None)
+
+        if payload.guild_id is None or user_id is None:
+            log.warning(f'[on_raw_member_remove] incomplete payload: guild_id={payload.guild_id}, user_id={user_id}')
+            return
+
+        await set_key(payload.guild_id, user_id, "input_tokens", [])
 
 async def setup(bot):
     await bot.add_cog(Events(bot))
-
-
-
 ######################################################################################
 ##  MIT License                                                                     ##
 ##                                                                                  ##
-##  Copyright © 2024-2025 monk                                                      ##
+##  Copyright © 2024-2026 monk (https://github.com/monk-afk)                        ##
 ##                                                                                  ##
 ##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
 ##  of this software and associated documentation files (the "Software"), to deal   ##
