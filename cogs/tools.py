@@ -2,11 +2,11 @@
 import discord
 from discord.ext import commands
 from utils.dialogpt import dialogpt
-from datetime import datetime
 from utils.nosj import (
   get_input_tokens,
   set_key
 )
+from datetime import datetime
 
 class Tools(commands.Cog):
     def __init__(self, bot):
@@ -30,13 +30,21 @@ class Tools(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(send_messages=True)
+    async def dayone(self, ctx):
+        """Show SquareOne days online."""
+        # dayone = "2023-05-28 20:01:34" CEST (19:01:34 UCT)
+        onedays = f"{(datetime.now() - datetime(2023, 5, 28, 20, 1, 34)).total_seconds() / 86400:.5f}"
+        await ctx.send(f"SquareOne is {onedays} days old.")
+
+    @commands.command()
+    @commands.has_permissions(send_messages=True)
     async def forgetme(self, ctx):
         """Erase your chat history from møe's memory"""
         try:
             await set_key(ctx.guild.id, ctx.author.id, "input_tokens", [])
             await ctx.send(f"I have no memory of {ctx.author.mention}!")
         except Exception as e:
-            await log.warning(f"Could not forget user: {e}")
+            await log.warning(f"Could forget user: {e}")
 
     @commands.command()
     @commands.has_permissions(send_messages=True)
@@ -53,13 +61,10 @@ class Tools(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Tools(bot))
-
-
-
 ######################################################################################
 ##  MIT License                                                                     ##
 ##                                                                                  ##
-##  Copyright © 2024-2025 monk                                                      ##
+##  Copyright © 2024-2026 monk (https://github.com/monk-afk)                        ##
 ##                                                                                  ##
 ##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
 ##  of this software and associated documentation files (the "Software"), to deal   ##
