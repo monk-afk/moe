@@ -1,5 +1,5 @@
 # moe/cogs/tools.py
-# Copyright © 2026 monk (https://github.com/monk-afk)
+# Copyright © 2026 monk <https://github.com/monk-afk>
 # SPDX-License-Identifier: MIT
 import discord
 from discord.ext import commands
