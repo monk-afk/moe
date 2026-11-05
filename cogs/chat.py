@@ -1,4 +1,6 @@
-# cogs/chat.py
+# moe/cogs/chat.py
+# Copyright © 2026 monk (https://github.com/monk-afk)
+# SPDX-License-Identifier: MIT
 import discord
 import re
 import random
@@ -11,16 +13,17 @@ from utils.nosj import (
     get_reply_to
 )
 import asyncio
+from utils.conf import config
 from utils.logroll import logging
 log = logging.getLogger(__name__)
 
 from utils.dialogpt import dialogpt
 
 response_triggers = {
-    "moe": r".*\b@?[Mm][oø]e\b.*",
+    "moe": r".*\bm+[oø]+e+\b.*",
+    "atmoe": r".*<@1249786267898740757>.*",  # '@mention' is received by numeric ID
+    "doot": r".*\bdoot\b.*",
     "bot": r".*\bbots?\b.*",
-    "molo": r".*\b[Mm][Oo][Ll][Oo]+\b.*",
-    "monk": r".*\b@?[Mm][oø][Nn][Kk]+\b.*",
 }
 
 class Chat(commands.Cog):
@@ -29,11 +32,44 @@ class Chat(commands.Cog):
         self.processing_channel = {}
         self.model = dialogpt.load_model()
         self.tokenizer = dialogpt.load_tokenizer()
+        self.blacklist = config.blacklist
         self.bad_words_ids = self.get_blacklisted()
+        self.generation_lock = asyncio.Lock()
 
     def get_blacklisted(self): # will refuse to say words on the blacklist
-        bad_words_ids = [self.tokenizer(word, add_prefix_space=True).input_ids for word in dialogpt.blacklist]
+        bad_words_ids = [self.tokenizer(word, add_prefix_space=True).input_ids for word in self.blacklist]
         return bad_words_ids
+
+    def trim_token_memory(self, tokens):
+        if not tokens:
+            return []
+
+        eos_token_id = self.tokenizer.eos_token_id
+        token_list = list(tokens)
+        start_index = max(0, len(token_list) - 100)
+        trimmed = token_list[start_index:]
+
+        if start_index > 0 and token_list[start_index - 1] != eos_token_id:
+            try:
+                first_eos_index = trimmed.index(eos_token_id)
+            except ValueError:
+                first_eos_index = None
+
+            if first_eos_index is not None and first_eos_index < len(trimmed) - 1:
+                trimmed = trimmed[first_eos_index + 1:]
+
+        eos_positions = [
+            index
+            for index, token in enumerate(trimmed)
+            if token == eos_token_id
+        ]
+
+        if len(eos_positions) > 12:
+            trim_after_index = eos_positions[-13] + 1
+            if trim_after_index < len(trimmed):
+                trimmed = trimmed[trim_after_index:]
+
+        return list(trimmed)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -67,13 +103,12 @@ class Chat(commands.Cog):
             asyncio.create_task(self.processor(message))
 
     async def processor(self, message):
-        input_tokens = await self.generate_tokens_from_message(message)
-
         try:
+            input_tokens = await self.generate_tokens_from_message(message)
             await self.generate_response(message, input_tokens)
 
         except Exception as e:
-            log.error(f"ERROR processor({message}): {e}")
+            log.error("ERROR processor: %s", type(e).__name__)
             pass
 
         finally:
@@ -83,30 +118,13 @@ class Chat(commands.Cog):
         saved_input_ids = await get_input_tokens(message.guild.id, message.author.id) # get user chat history
 
         message_content = ' '.join(message.content.split()[:30]) # limit input 30 words from message
-
         new_user_input_ids = self.tokenizer.encode(message_content + self.tokenizer.eos_token, return_tensors='pt')
 
         if saved_input_ids is None:
             saved_input_ids = []
 
         new_saved_input_ids = saved_input_ids + new_user_input_ids.flatten().tolist()
-
-        eos_count = 0
-        token_count = 0
-        eos_break_flag = 0
-        final_saved_input_ids = []
-
-        for token in reversed(new_saved_input_ids):  # reversed to trim oldest messages from input tokens
-            token_count += 1  # limit input to 100, or 12 EOS tokens
-            if token == 50256:
-                eos_count += 1
-            if token_count >= 100:
-                eos_break_flag = 1
-            if eos_count == 12 or (eos_break_flag == 1 and token == 50256):
-                break
-            final_saved_input_ids.insert(0, token)
-
-        return final_saved_input_ids
+        return self.trim_token_memory(new_saved_input_ids)
 
     async def generate_response(self, message, final_saved_input_ids):
         await asyncio.sleep(random.uniform(2.2, 3.8))  # delay typing
@@ -116,55 +134,34 @@ class Chat(commands.Cog):
 
             attention_mask = torch.ones_like(bot_input_ids)
 
-            response_tokens = self.model.generate(
-                bot_input_ids,
-                min_length = 20,
-                max_length = 1000,
-                pad_token_id = self.tokenizer.eos_token_id,
-                attention_mask = attention_mask,
-                bad_words_ids = self.bad_words_ids,
-                repetition_penalty = 1.0,
-                do_sample = True,
-                # adjusting these causes the most noticeable change to responses
-                top_k = 85,                # limits the number of tokens considered
-                top_p = 0.95,              # smallest set of tokens whose total probability adds up to
-                temperature = 0.81,        # lower temp outputs more predictably, high temp more varied and creative
-                no_repeat_ngram_size = 2   # prevents repeating words too often, 3 is more strict
-            )
+            async with self.generation_lock:
+                response_tokens = await asyncio.to_thread(
+                    self.model.generate,
+                    bot_input_ids,
+                    min_length = 20,
+                    max_length = 1000,
+                    pad_token_id = self.tokenizer.eos_token_id,
+                    attention_mask = attention_mask,
+                    bad_words_ids = self.bad_words_ids,
+                    repetition_penalty = 1.0,
+                    do_sample = True,
+                    # adjusting these causes the most noticeable change to responses
+                    top_k = 95,                # limits the number of tokens considered
+                    top_p = 0.9,               # smallest set of tokens whose total probability adds up to
+                    temperature = 0.7,         # lower temp outputs more predictably, high temp more varied and creative
+                    no_repeat_ngram_size = 2   # prevents repeating words too often, 3 is more strict\
+                )
 
             response = self.tokenizer.decode(response_tokens[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
 
             if not response.strip():
-                log.warning(f"Refused sending empty message, retrying")
-                return self.generate_response(message, final_saved_input_ids)
+                log.warning(f"Refused empty message")
+                return
 
             final_saved_input_ids += self.tokenizer.encode(response + self.tokenizer.eos_token)
+            final_saved_input_ids = self.trim_token_memory(final_saved_input_ids)
             await set_key(message.guild.id, message.author.id, "input_tokens", final_saved_input_ids)
         await message.channel.send(response)
 
 async def setup(bot):
     await bot.add_cog(Chat(bot))
-
-######################################################################################
-##  MIT License                                                                     ##
-##                                                                                  ##
-##  Copyright © 2024-2025 monk                                                      ##
-##                                                                                  ##
-##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
-##  of this software and associated documentation files (the "Software"), to deal   ##
-##  in the Software without restriction, including without limitation the rights    ##
-##  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       ##
-##  copies of the Software, and to permit persons to whom the Software is           ##
-##  furnished to do so, subject to the following conditions:                        ##
-##                                                                                  ##
-##  The above copyright notice and this permission notice shall be included in all  ##
-##  copies or substantial portions of the Software.                                 ##
-##                                                                                  ##
-##  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      ##
-##  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        ##
-##  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     ##
-##  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          ##
-##  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   ##
-##  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   ##
-##  SOFTWARE.                                                                       ##
-######################################################################################
