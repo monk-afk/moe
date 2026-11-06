@@ -32,7 +32,6 @@ class Chat(commands.Cog):
         self.processing_channel = {}
         self.model = dialogpt.load_model()
         self.tokenizer = dialogpt.load_tokenizer()
-        self.bad_words_ids = self.get_blacklisted()
         self.generation_lock = asyncio.Lock()
         self.blacklist = {
             "love", "lub", "luv", "ily", "kiss", "baby", "kith",
@@ -42,6 +41,7 @@ class Chat(commands.Cog):
             "girlfriend", "sexy", "fuck", "shit", "whore", "karmawhore",
             "fap", "fapping", "fappening", "beer", "wuv", "fokken", "gulag",
         }
+        self.bad_words_ids = self.get_blacklisted()
 
     def get_blacklisted(self): # will refuse to say words on the blacklist
         bad_words_ids = [self.tokenizer(word, add_prefix_space=True).input_ids for word in self.blacklist]
