@@ -1,4 +1,6 @@
-# utils/nosj.py
+# moe/utils/nosj.py
+# Copyright © 2026 monk <https://github.com/monk-afk>
+# SPDX-License-Identifier: MIT
 import json
 import asyncio
 from utils.logroll import logging
@@ -43,9 +45,6 @@ async def save_file_data():
             json.dump(data, f, indent=None, separators=(",", ":"))
         log.info("OK saved data to file")
 
-async def show_file_data():
-    return json.dumps(data, indent=None, separators=(",", ":"))
-
 async def reset_file_data():
     global data
     log.info("Reset global data file.")
@@ -54,7 +53,7 @@ async def reset_file_data():
 
 # Set or remove keys from table
 async def set_key(guild, user, key, value):
-    """ 
+    """
         set_key(guild, user, "input_tokens", [1234])  # set input token
         set_key(guild, user, "input_tokens", [])      # clear input token
         set_key(guild, user, "reply_to", True)        # set reply_to
@@ -101,33 +100,8 @@ async def drop_guild_input_tokens(guild):
         log.info(f"OK drop_guild_input_tokens({guild})")
 
 # drop user tokens across all guilds (not implemented yet)
-async def drop_user_input_tokens(user): 
+async def drop_user_input_tokens(user):
     for guild in list(data.keys()):
         if "users" in data[guild] and user in data[guild]["users"]:
             await set_key(guild, user, tokens=None)
     log.info(f"OK drop_user_input_tokens({user})")
-
-
-######################################################################################
-##  MIT License                                                                     ##
-##                                                                                  ##
-##  Copyright © 2024-2025 monk (Discord ID: 699370563235479624)                     ##
-##                                                                                  ##
-##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
-##  of this software and associated documentation files (the "Software"), to deal   ##
-##  in the Software without restriction, including without limitation the rights    ##
-##  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       ##
-##  copies of the Software, and to permit persons to whom the Software is           ##
-##  furnished to do so, subject to the following conditions:                        ##
-##                                                                                  ##
-##  The above copyright notice and this permission notice shall be included in all  ##
-##  copies or substantial portions of the Software.                                 ##
-##                                                                                  ##
-##  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      ##
-##  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        ##
-##  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     ##
-##  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          ##
-##  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   ##
-##  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   ##
-##  SOFTWARE.                                                                       ##
-######################################################################################

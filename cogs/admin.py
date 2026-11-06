@@ -7,8 +7,7 @@ from utils.nosj import (
     drop_guild_input_tokens,
     set_key,
     reset_file_data,
-    save_file_data,
-    show_file_data
+    save_file_data
 )
 
 class Admin(commands.Cog):
@@ -20,7 +19,7 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def forgetuser(self, ctx, user: discord.Member):
-        """Clear moe's chat memory of a member."""
+        """Clear the specified user's conversation."""
         if not user:
             await ctx.send("Forget who? I need a username")
             return
@@ -30,14 +29,14 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def forgetguild(self, ctx):
-        """Clear all chat memory of this Guild."""
+        """Clear all user conversations."""
         await drop_guild_input_tokens(ctx.guild.id)
         await ctx.send(f"I have no memory of {ctx.guild.name}.")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def resetguild(self, ctx):
-        """Clear all chat memory of this Guild."""
+        """Reset guild chats and settings."""
         await drop_guild(ctx.guild.id)
         await ctx.send(f"Guild {ctx.guild.name} data reset.")
 
@@ -106,17 +105,6 @@ class Admin(commands.Cog):
         await ctx.send("Nooo...")
         await save_file_data()
         await self.bot.close()
-
-    @commands.command()
-    @commands.is_owner()
-    async def dumpbackend(self, ctx):
-        """Dump memory file to logs"""
-        try:
-            json_data = await show_file_data()
-            log.info(f"{json_data}")
-            await ctx.send("Dumped backend logs! lol")
-        except Exception as e:
-            await ctx.send(f"Could not dump! {e}")
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))
