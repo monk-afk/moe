@@ -1,4 +1,6 @@
-# cogs/admin.py
+# moe/cogs/admin.py
+# Copyright © 2026 monk <https://github.com/monk-afk>
+# SPDX-License-Identifier: MIT
 import discord
 from discord.ext import commands
 from utils.logroll import logging
@@ -56,23 +58,17 @@ class Admin(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def sayhi(self, ctx, user: discord.User):
-        """Add a member to the reply list."""
-        if not user:
-            await ctx.send("I'm not a mind-reader you know, tell me a name!")
-            return
-        await set_key(ctx.guild.id, user.id, "reply_to", True)
-        await ctx.send(f"Hello {user.name}!")
+    async def ignore(self, ctx, user: discord.Member):
+        """Add a member to the ignore list."""
+        await set_key(ctx.guild.id, user.id, "ignore", True)
+        await ctx.send(f"Cold shoulder activated!")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def saybye(self, ctx, user: discord.User):
-        """Remove a member from the reply list."""
-        if not user:
-            await ctx.send("Bye to who?")
-            return
-        await set_key(ctx.guild.id, user.id, "reply_to", False)
-        await ctx.send(f"Bye {user.name}!")
+    async def dontignore(self, ctx, user: discord.Member):
+        """Remove a member from the ignore list."""
+        await set_key(ctx.guild.id, user.id, "ignore", False)
+        await ctx.send(f"Hi {user.name}!")
 
     @commands.command()
     @commands.is_owner()
@@ -108,29 +104,3 @@ class Admin(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))
-
-
-
-######################################################################################
-##  MIT License                                                                     ##
-##                                                                                  ##
-##  Copyright © 2024-2025 monk                                                      ##
-##                                                                                  ##
-##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
-##  of this software and associated documentation files (the "Software"), to deal   ##
-##  in the Software without restriction, including without limitation the rights    ##
-##  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       ##
-##  copies of the Software, and to permit persons to whom the Software is           ##
-##  furnished to do so, subject to the following conditions:                        ##
-##                                                                                  ##
-##  The above copyright notice and this permission notice shall be included in all  ##
-##  copies or substantial portions of the Software.                                 ##
-##                                                                                  ##
-##  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      ##
-##  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        ##
-##  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     ##
-##  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          ##
-##  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   ##
-##  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   ##
-##  SOFTWARE.                                                                       ##
-######################################################################################

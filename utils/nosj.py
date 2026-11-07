@@ -54,10 +54,10 @@ async def reset_file_data():
 # Set or remove keys from table
 async def set_key(guild, user, key, value):
     """
-        set_key(guild, user, "input_tokens", [1234])  # set input token
-        set_key(guild, user, "input_tokens", [])      # clear input token
-        set_key(guild, user, "reply_to", True)        # set reply_to
-        set_key(guild, user, "reply_to", False)       # unset reply_to
+        set_key(guild, user, "input_tokens", [1234])  # set input_token
+        set_key(guild, user, "input_tokens", [])      # clear input_token
+        set_key(guild, user, "ignore", True)          # set ignore
+        set_key(guild, user, "ignore", False)         # unset ignore
         set_key(guild, None, "reply_channel", None)   # unset reply_channel
         set_key(guild, None, "reply_channel", 1234)   # set reply_channel
     """
@@ -69,7 +69,7 @@ async def set_key(guild, user, key, value):
 
     else:
         if user not in data[guild]["users"]:
-            data[guild]["users"][user] = {"reply_to": False, "input_tokens": []}
+            data[guild]["users"][user] = {"ignore": False, "input_tokens": []}
         data[guild]["users"][user][key] = value
 
     await save_file_data()
@@ -82,8 +82,8 @@ async def get_reply_channel(guild):
 async def get_input_tokens(guild, user):
     return data.get(guild, {}).get("users", {}).get(user, {}).get("input_tokens", [])
 
-async def get_reply_to(guild, user):
-    return data.get(guild, {}).get("users", {}).get(user, {}).get("reply_to", False)
+async def is_ignored(guild, user):
+    return data.get(guild, {}).get("users", {}).get(user, {}).get("ignore", False)
 
 # Drop guild
 async def drop_guild(guild):

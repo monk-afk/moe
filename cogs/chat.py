@@ -10,7 +10,7 @@ from utils.nosj import (
     get_reply_channel,
     get_input_tokens,
     set_key,
-    get_reply_to
+    is_ignored
 )
 import asyncio
 from utils.conf import config
@@ -87,6 +87,10 @@ class Chat(commands.Cog):
             return
 
         guild_id = message.guild.id
+
+        if await is_ignored(guild_id, message.author.id):
+            return
+
         channel_id = message.channel.id
 
         if channel_id in self.processing_channel:  # process only one message per channel
@@ -104,7 +108,6 @@ class Chat(commands.Cog):
         if (
             channel_id == reply_channel
             or any(re.match(pattern, message.content.lower()) for pattern in response_triggers.values())
-            or await get_reply_to(guild_id, message.author.id)
         ):
             self.processing_channel[channel_id] = True  # to avoid queuing message processing in a single channel
             asyncio.create_task(self.processor(message))
