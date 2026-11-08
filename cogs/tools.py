@@ -3,17 +3,12 @@
 # SPDX-License-Identifier: MIT
 import discord
 from discord.ext import commands
-from utils.dialogpt import dialogpt
-from utils.nosj import (
-  get_input_tokens,
-  set_key
-)
+from utils.nosj import drop_user_data
 from datetime import datetime
 
 class Tools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.tokenizer = dialogpt.load_tokenizer()
 
     @commands.command()
     @commands.has_permissions(send_messages=True)
@@ -41,12 +36,12 @@ class Tools(commands.Cog):
     @commands.command()
     @commands.has_permissions(send_messages=True)
     async def forgetme(self, ctx):
-        """Erase your chat history from møe's memory"""
+        """Erase all your chat history from møe's memory"""
         try:
-            await set_key(ctx.guild.id, ctx.author.id, "input_tokens", [])
+            await drop_user_data(ctx.author.id)
             await ctx.send(f"I have no memory of {ctx.author.mention}!")
         except Exception as e:
-            await log.warning(f"Could forget user: {e}")
+            await log.warning(f"Could not forget user: {e}")
 
 async def setup(bot):
     await bot.add_cog(Tools(bot))
