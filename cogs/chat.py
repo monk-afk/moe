@@ -9,8 +9,8 @@ import torch
 from utils.nosj import (
     get_reply_channel,
     get_input_tokens,
-    set_key,
-    is_ignored
+    set_input_tokens,
+    get_ignore
 )
 import asyncio
 from utils.conf import config
@@ -88,7 +88,7 @@ class Chat(commands.Cog):
 
         guild_id = message.guild.id
 
-        if await is_ignored(guild_id, message.author.id):
+        if await get_ignore(message.author.id):
             return
 
         channel_id = message.channel.id
@@ -105,17 +105,39 @@ class Chat(commands.Cog):
         ):
             return
 
+        user_or_channel = await self.get_user_or_channel(message)
+
         if (
             channel_id == reply_channel
             or any(re.match(pattern, message.content.lower()) for pattern in response_triggers.values())
+            or user_or_channel == message.author.id
         ):
             self.processing_channel[channel_id] = True  # to avoid queuing message processing in a single channel
-            asyncio.create_task(self.processor(message))
+            asyncio.create_task(self.processor(message, user_or_channel))
 
-    async def processor(self, message):
+    async def get_user_or_channel(self, message):
+        if message.type == discord.MessageType.reply:
+            reference = message.reference
+
+            if reference is not None and reference.message_id is not None:
+                replied_message = (reference.resolved or reference.cached_message)
+
+                if not isinstance(replied_message, discord.Message):
+                    try:
+                        replied_message = await message.channel.fetch_message(reference.message_id)
+                    except (discord.NotFound, discord.Forbidden, discord.HTTPException,):
+                        replied_message = None
+                if (
+                    isinstance(replied_message, discord.Message)
+                    and replied_message.author.id == self.bot.user.id
+                ):
+                    return message.author.id
+        return message.channel.id
+
+    async def processor(self, message, user_or_channel):
         try:
-            input_tokens = await self.generate_tokens_from_message(message)
-            await self.generate_response(message, input_tokens)
+            input_tokens = await self.generate_tokens_from_message(message, user_or_channel)
+            await self.generate_response(message, input_tokens, user_or_channel)
 
         except Exception as e:
             log.error("ERROR processor: %s", type(e).__name__)
@@ -124,8 +146,8 @@ class Chat(commands.Cog):
         finally:
             del self.processing_channel[message.channel.id]
 
-    async def generate_tokens_from_message(self, message):
-        saved_input_ids = await get_input_tokens(message.guild.id, message.author.id) # get user chat history
+    async def generate_tokens_from_message(self, message, user_or_channel):
+        saved_input_ids = await get_input_tokens(message.guild.id, user_or_channel) # get user chat history
 
         message_content = ' '.join(message.content.split()[:30]) # limit input 30 words from message
         new_user_input_ids = self.tokenizer.encode(message_content + self.tokenizer.eos_token, return_tensors='pt')
@@ -136,7 +158,7 @@ class Chat(commands.Cog):
         new_saved_input_ids = saved_input_ids + new_user_input_ids.flatten().tolist()
         return self.trim_token_memory(new_saved_input_ids)
 
-    async def generate_response(self, message, final_saved_input_ids):
+    async def generate_response(self, message, final_saved_input_ids, user_or_channel):
         await asyncio.sleep(random.uniform(2.2, 3.8))  # delay typing
 
         async with message.channel.typing():
@@ -170,7 +192,7 @@ class Chat(commands.Cog):
 
             final_saved_input_ids += self.tokenizer.encode(response + self.tokenizer.eos_token)
             final_saved_input_ids = self.trim_token_memory(final_saved_input_ids)
-            await set_key(message.guild.id, message.author.id, "input_tokens", final_saved_input_ids)
+            await set_input_tokens(message.guild.id, user_or_channel, final_saved_input_ids)
         await message.channel.send(response)
 
 async def setup(bot):
