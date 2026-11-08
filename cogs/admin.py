@@ -7,7 +7,7 @@ from utils.logroll import logging
 log = logging.getLogger(__name__)
 from utils.nosj import (
     drop_guild_input_tokens,
-    set_key,
+    drop_user_data,
     reset_file_data,
     save_file_data
 )
@@ -25,7 +25,7 @@ class Admin(commands.Cog):
         if not user:
             await ctx.send("Forget who? I need a username")
             return
-        await set_key(ctx.guild.id, user.id, "input_tokens", [])
+        await drop_user_data(user.id)
         await ctx.send(f"I have no memory of {user.mention}!")
 
     @commands.command()
@@ -46,28 +46,28 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def setreplychannel(self, ctx):
         """Set moe's designated reply channel."""
-        await set_key(ctx.guild.id, None, "reply_channel", ctx.channel.id)
+        await set_reply_channel(ctx.guild.id, ctx.channel.id)
         await ctx.send(f"Reply channel set to {ctx.channel.mention}")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def unsetreplychannel(self, ctx):
         """Unset the reply channel for the guild."""
-        await set_key(ctx.guild.id, None, "reply_channel", None)
+        await set_reply_channel(ctx.guild.id, None)
         await ctx.send("Reply channel unset.")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def ignore(self, ctx, user: discord.Member):
         """Add a member to the ignore list."""
-        await set_key(ctx.guild.id, user.id, "ignore", True)
+        await set_ignore(user.id, True)
         await ctx.send(f"Cold shoulder activated!")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def dontignore(self, ctx, user: discord.Member):
         """Remove a member from the ignore list."""
-        await set_key(ctx.guild.id, user.id, "ignore", False)
+        await set_ignore(user.id, False)
         await ctx.send(f"Hi {user.name}!")
 
     @commands.command()
