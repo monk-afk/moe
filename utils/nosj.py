@@ -56,7 +56,6 @@ async def set_ignore(user, value):
         data.pop(user, None)
 
 
-# These could be like set_key,
 async def get_reply_channel(guild):
     return data.get(guild, {}).get("reply_channel", None)
 
@@ -87,8 +86,10 @@ async def drop_guild_input_tokens(guild):
         for user_or_channel in list(data[guild]["chats"].keys()):
             data[guild]["chats"].pop(user_or_channel)
 
-# drop user tokens across all guilds
-async def drop_user_data(user_or_channel):
-    for guild in list(data.keys()):
-        if "chats" in data[guild] and user_or_channel in data[guild]["chats"]:
-            data[guild]["chats"].pop(user_or_channel)
+# Drop tokens from one guild, or from every guild when guild is None
+async def drop_user_data(user_or_channel, guild=None):
+    guilds = [guild] if guild is not None else list(data.keys())
+
+    for guild_id in guilds:
+        chats = data.get(guild_id, {}).get("chats", {})
+        chats.pop(user_or_channel, None)
