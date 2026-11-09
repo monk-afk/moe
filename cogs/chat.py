@@ -193,7 +193,11 @@ class Chat(commands.Cog):
             final_saved_input_ids += self.tokenizer.encode(response + self.tokenizer.eos_token)
             final_saved_input_ids = self.trim_token_memory(final_saved_input_ids)
             await set_input_tokens(message.guild.id, user_or_channel, final_saved_input_ids)
-        await message.channel.send(response)
+
+            if user_or_channel == message.author.id:
+                await message.reply(response, mention_author=True)
+            else:
+                await message.channel.send(response)
 
 async def setup(bot):
     await bot.add_cog(Chat(bot))
