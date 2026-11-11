@@ -22,7 +22,7 @@ from utils.dialogpt import dialogpt
 response_triggers = {
     "moe": r".*\bm+[oø]+e+\b.*",
     "atmoe": r".*<@1249786267898740757>.*",  # '@mention' is received by numeric ID
-    "doot": r".*\bdoot\b.*",
+    "doot": r".*\bd+o+o+t+",
     "bot": r".*\bbots?\b.*",
 }
 
@@ -92,10 +92,6 @@ class Chat(commands.Cog):
             return
 
         channel_id = message.channel.id
-
-        if channel_id in self.processing_channel:  # process only one message per channel
-            return
-
         reply_channel = await get_reply_channel(guild_id)
 
         if (
@@ -103,6 +99,11 @@ class Chat(commands.Cog):
             # don't reply to bot messages not in the reply channel
             or (message.author.bot and channel_id != reply_channel)
         ):
+            return
+
+        channel_tokens = await self.update_channel_context(message)
+
+        if channel_id in self.processing_channel:  # process only one message per channel
             return
 
         user_or_channel = await self.get_user_or_channel(message)
@@ -113,7 +114,7 @@ class Chat(commands.Cog):
             or user_or_channel == message.author.id
         ):
             self.processing_channel[channel_id] = True  # to avoid queuing message processing in a single channel
-            asyncio.create_task(self.processor(message, user_or_channel))
+            asyncio.create_task(self.processor(message, user_or_channel, channel_tokens))
 
     async def get_user_or_channel(self, message):
         if message.type == discord.MessageType.reply:
@@ -134,9 +135,12 @@ class Chat(commands.Cog):
                     return message.author.id
         return message.channel.id
 
-    async def processor(self, message, user_or_channel):
+    async def processor(self, message, user_or_channel, channel_tokens):
         try:
-            input_tokens = await self.generate_tokens_from_message(message, user_or_channel)
+            if user_or_channel == message.channel.id:
+                input_tokens = channel_tokens
+            else:
+                input_tokens = await self.generate_tokens_from_message(message, user_or_channel)
             await self.generate_response(message, input_tokens, user_or_channel)
 
         except Exception as e:
@@ -145,6 +149,25 @@ class Chat(commands.Cog):
 
         finally:
             del self.processing_channel[message.channel.id]
+
+    async def update_channel_context(self, message):
+        guild_id = message.guild.id
+        channel_id = message.channel.id
+
+        saved_input_ids = await get_input_tokens(guild_id, channel_id)
+
+        message_content = ' '.join(message.content.split()[:30])
+        message_input_ids = self.tokenizer.encode(
+            message_content + self.tokenizer.eos_token,
+            return_tensors='pt'
+        )
+
+        channel_tokens = saved_input_ids + message_input_ids.flatten().tolist()
+        channel_tokens = self.trim_token_memory(channel_tokens)
+
+        await set_input_tokens(guild_id, channel_id, channel_tokens)
+
+        return channel_tokens
 
     async def generate_tokens_from_message(self, message, user_or_channel):
         saved_input_ids = await get_input_tokens(message.guild.id, user_or_channel) # get user chat history
@@ -190,9 +213,17 @@ class Chat(commands.Cog):
                 log.warning(f"Refused empty message")
                 return
 
-            final_saved_input_ids += self.tokenizer.encode(response + self.tokenizer.eos_token)
-            final_saved_input_ids = self.trim_token_memory(final_saved_input_ids)
-            await set_input_tokens(message.guild.id, user_or_channel, final_saved_input_ids)
+            response_input_ids = self.tokenizer.encode(response + self.tokenizer.eos_token)
+
+            if user_or_channel == message.channel.id:
+                saved_input_ids = await get_input_tokens(message.guild.id, user_or_channel)
+            else:
+                saved_input_ids = final_saved_input_ids
+
+            saved_input_ids = saved_input_ids + response_input_ids
+            saved_input_ids = self.trim_token_memory(saved_input_ids)
+
+            await set_input_tokens(message.guild.id, user_or_channel, saved_input_ids)
 
             if user_or_channel == message.author.id:
                 await message.reply(response, mention_author=True)
