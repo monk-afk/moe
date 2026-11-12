@@ -77,9 +77,6 @@ class Admin(commands.Cog):
     @commands.is_owner()
     async def reload(self, ctx, extension: str):
         """Reload a module"""
-        if not extension:
-            await ctx.send("Reload which module? Be specific.")
-            return
         try:
             await self.bot.reload_extension(f"cogs.{extension}")
             log.warning(f"cogs.{extension} reloaded by {ctx.author}")
