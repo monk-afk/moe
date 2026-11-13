@@ -3,7 +3,14 @@
 # SPDX-License-Identifier: MIT
 import json
 import asyncio
+
+from pathlib import Path
+from cryptography.fernet import Fernet
+from utils.conf import config
+
 file_lock = asyncio.Lock()
+key = Path(config.storage_key_file).expanduser().read_bytes().strip()
+cipher = Fernet(key)
 data = {}
 
 # JSON tables are string keys, we need integers
@@ -27,18 +34,23 @@ async def load_file_data():
     global data
     try:
         async with file_lock:
-            with open("moe_data.json", "r") as f:
-                loaded_data = json.load(f)
-                if isinstance(loaded_data, dict):
-                    loaded_data = convert_keys_to_int(loaded_data)
-                    data.update(loaded_data)
+            with open("moe_data.json", "rb") as f:
+                payload = cipher.decrypt(f.read())
+
+            loaded_data = json.loads(payload)
+
+            if isinstance(loaded_data, dict):
+                loaded_data = convert_keys_to_int(loaded_data)
+                data.update(loaded_data)
+
     except (FileNotFoundError, json.JSONDecodeError):
         data = {}
 
 async def save_file_data():
+    payload = json.dumps(data, separators=(",", ":")).encode()
     async with file_lock:
-        with open("moe_data.json", "w") as f:
-            json.dump(data, f, indent=None, separators=(",", ":"))
+        with open("moe_data.json", "wb") as f:
+            f.write(cipher.encrypt(payload))
 
 async def reset_file_data():
     global data
