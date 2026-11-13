@@ -1,98 +1,93 @@
 # Terms of Service
 
-## 1. License Acknowledgment
+Effective Date: November 13, 2026
 
-- Distributed under the MIT License. [Learn more about the MIT License](https://opensource.org/licenses/MIT).
+## 1. Service Conditions
 
-By using this software, you agree to comply with the terms of the MIT License, which allows you to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions specified in the license.
+These Terms of Service ("Terms") govern access to and use of møe ("Moe", "the Chatbot", "the Application"), operated by SquareOne ("we", "our", "us").
 
-## 2. Service Conditions
+By using Moe, you agree to these Terms. Your use of Discord remains subject to the [Discord Terms of Service](https://discord.com/terms) and [Discord Community Guidelines](https://discord.com/guidelines).
 
-- These Terms of Service ("Terms") govern your access and usage of møe ("the Chatbot", "the Application", "the Software"), provided by SquareOne ("the Team", "the Company", "we", "us", "our").
+If you do not agree to these Terms, you may not use Moe.
 
-By using the Chatbot, you agree to comply with and be bound by these Terms, including but not limited to the Terms and Policies described by [Discord Terms of Service](https://discord.com/terms), [Privacy Policy](https://discord.com/privacy), [Developer Policy](https://discord.com/developers/docs/policies-and-agreements/developer-policy), and [Developer Terms of Service](https://discord.com/developers/docs/policies-and-agreements/developer-terms-of-service).
+## 2. Description of Moe
 
-*If you do not agree with any part of these Terms or Policies, you may not use møe the Chatbot.*
+Moe is a generative conversation chatbot powered by Microsoft's DialoGPT, a pretrained dialogue-response generation model. DialoGPT was trained on 147 million conversation-like exchanges extracted from Reddit comment chains. Moe uses the model and recent conversation context to generate new responses; it does not retrieve responses directly from the training dataset.
 
-## 3. Description of møe the Chatbot
+Moe uses the Hugging Face Transformers software library to load and run the model locally. Discord message content is not sent to Microsoft or Hugging Face for response generation, and it is not used to train or fine-tune the model.
 
-møe is a generative conversation AI chatbot powered by Microsoft's DialoGPT; a large-scale pretrained dialogue response generation model for multiturn conversations. Responses are generated based on the model's pretrained dataset. The model is trained on 147M multi-turn dialogue from Reddit discussion threads. The model is provided by Huggingface's Transformers module. For more information about the Transformers module, please refer to [Transformers PyPi Project](https://pypi.org/project/transformers/).
+Moe may produce inaccurate, inappropriate, unexpected, or nonsensical responses. Generated responses do not represent the views of SquareOne.
 
-## 4. Eligibility
+## 3. Eligibility
 
-You confirm and agree that (i) you are at least 13 years of age and meet the minimum age required by the laws in your country, and (ii) if you are not old enough to have authority to consent to the Terms in your country, that your parent or legal guardian must agree to the Terms on your behalf. If you are a parent or legal guardian, and your teenager accesses or uses the APIs, then the Terms also apply to you and you are responsible for your teenager’s activity. Please read all the Terms carefully.
+You must be at least 13 years old and meet the minimum age required to use Discord in your jurisdiction. If you have not reached the age of majority where you live, your parent or legal guardian must agree to these Terms on your behalf.
 
-## 5. Use of the Chatbot
+## 4. Use of the Chatbot
 
-### 5.1 Permitted Use
+### 4.1 Permitted Use
 
-You may use the Chatbot only for lawful purposes, with respect to intellectual property rights, complying with all applicable laws and regulations, and in accordance with these Terms.
+You may use Moe only for lawful purposes and in accordance with these Terms, applicable law, Discord's rules, and the rules of the Discord guild in which Moe is used.
 
-### 5.2 Prohibited Use
+### 4.2 Prohibited Use
 
 You may not:
 
-- Violate any applicable laws, regulations, or third-party rights.
-- Use the Chatbot to harm, abuse, harass, threaten, or intimidate any person or entity.
-- Use the Chatbot to engage in any fraudulent activity or deceptive practices.
-- Use the Chatbot to distribute malware or other malicious code.
-- Attempt to gain unauthorized access to any computer network or system.
-- Interfere with or disrupt the operation of the Chatbot or any servers or networks connected to the Chatbot.
-- Use the Chatbot in any way that could damage, disable, overburden, or impair the Chatbot.
-- Violate any other Terms or Conditions set forth by Discord, Huggingface, or services connected to the Chatbot.
+- Violate applicable laws, regulations, or third-party rights.
+- Use Moe to harm, abuse, harass, threaten, or intimidate another person.
+- Use Moe for fraud, deception, or distribution of malware or malicious code.
+- Attempt to gain unauthorized access to Moe or any connected computer system.
+- Interfere with, disrupt, overload, or impair Moe's operation.
+- Attempt to evade an ignore restriction or other abuse-prevention measure.
+- Use Moe in violation of Discord's applicable terms, policies, or guidelines.
 
-## 6. User Content
+## 5. User Content
 
-### 6.1 Responsibility for User Content
+### 5.1 Responsibility for User Content
 
-You are solely responsible for any content, messages, or other materials ("User Content") that you create, transmit, or display while using the Chatbot.
+You are responsible for the messages and other content you submit in Discord channels accessible to Moe ("User Content"). You must have the necessary rights to submit that content.
 
-### 6.2 Rights to User Content
+### 5.2 Limited Permission to Process User Content
 
-By submitting User Content, you grant the Team a worldwide, non-exclusive, royalty-free, sublicensable, and transferable license to use, reproduce, distribute, prepare derivative works of, display, and perform the User Content in connection with the Chatbot and the Company's business operations.
+By submitting User Content in a channel accessible to Moe, you permit us to process that content only as necessary to operate, secure, and provide the Chatbot as described in the [Privacy Policy](./Privacy_Policy.md). This permission does not transfer ownership of your User Content to us.
 
-### 6.2.1 Limitations
+### 5.3 Limitations
 
-As described by Discord Developer Policy, we do not collect or use message content obtained through the APIs to train machine learning or AI models (including large language models) unless express permission is granted by Discord.
+We do not use Discord message content to train or fine-tune machine-learning or artificial-intelligence models without Discord's express permission.
 
-Furthermore, as described by Discord Developer Policy, we do not use API Data to: profile Discord users, their identities, or their relationships with other users; to discriminate against anyone based on protected characteristics (as defined in the Discord Community Guidelines); or for eligibility considerations for benefits or for purposes such as employment, housing, insurance, or otherwise.
+We do not use Discord API data to profile users or their relationships, discriminate based on protected characteristics, or make decisions concerning employment, housing, insurance, credit, or similar benefits.
 
-We do not, and do not use our Application to, obtain API Data or transmit data to Discord (i) of persons under the age of 13 or the minimum age required by law in their jurisdiction (if older) or (ii) that includes protected health information, financial information, or other sensitive information under applicable law, except to the extent specifically allowed by our Terms for a given Discord service or if necessary to process a financial transaction as enabled by a Discord service.
+Moe is not intended to process protected health information, financial information, authentication credentials, or other sensitive personal information. Do not intentionally submit such information to Moe.
 
-## 7. Intellectual Property
+## 6. Open Source and Intellectual Property
 
-### 7.1 Ownership
+Moe's source code is distributed under the [MIT License](https://opensource.org/licenses/MIT). The MIT License governs use, copying, modification, and distribution of the source code; these Terms govern use of the hosted Chatbot service.
 
-The Chatbot, including all intellectual property rights therein, is owned by the Company or its licensors. The Software is open source and distributed under the MIT License. You may not use the Chatbot except as expressly permitted by these Terms. If you distribute the Software, you are bound by the MIT License, and must comply with the conditions described by the License.
+Third-party models, libraries, trademarks, and other materials remain the property of their respective owners and are subject to their applicable licences.
 
-### 7.2 Feedback
+### 6.1 Feedback
 
-If you provide any feedback, bug reports, suggestions, or comments about the Chatbot ("Feedback"), you grant the Company the right to use the Feedback without restriction or obligation to you.
+If you provide feedback, bug reports, or suggestions concerning Moe, you permit us to use that feedback without restriction or compensation.
 
-## 8. Disclaimer of Warranties
+## 7. Disclaimer of Warranties
 
-THE CHATBOT IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, THE COMPANY DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT OF PROPRIETARY RIGHTS.
+THE CHATBOT IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, WE DISCLAIM ALL EXPRESS OR IMPLIED WARRANTIES, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
-## 9. Limitation of Liability
+## 8. Limitation of Liability
 
-TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, THE COMPANY WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE CHATBOT, WHETHER OR NOT THE COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, WE WILL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR EXEMPLARY DAMAGES ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF MOE, WHETHER OR NOT WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-## 10. Modifications
+## 9. Modifications
 
-The Team reserves the right to modify or update these Terms, and the Software governed by these Terms, at any time. Any changes will be effective immediately upon posting the updated Terms on the Chatbot or notifying you directly. Your continued use of the Chatbot after any such changes constitutes your acceptance of the updated Terms.
+We may modify these Terms when Moe or its operation changes. Updated Terms will be published with a new effective date. Continued use of Moe after the updated Terms take effect constitutes acceptance of the updated Terms.
 
-## 11. Termination
+## 10. Termination
 
-We may terminate or suspend your access to the Chatbot at any time, without notice and for any reason, including if you violate these Terms.
+We may suspend or terminate access to Moe when necessary to protect the service, enforce these Terms, comply with applicable law, or discontinue the Chatbot.
 
-## 12. Governing Law
+## 11. Governing Law
 
-Distributed under the MIT License. By using this software, you agree to comply with the terms of the [MIT License](https://mit-license.org/), which allows you to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions specified in the license.
+These Terms are governed by the laws of Canada, without regard to conflict-of-law principles. Any dispute arising under these Terms will be subject to the jurisdiction of the courts in Canada.
 
-10. Governing Law
+## 12. Contact Us
 
-These Terms shall be governed by and construed in accordance with the laws of Canada, without regard to its conflict of law principles. Any disputes arising under these terms will be subject to the exclusive jurisdiction of the courts in Canada.
-
-## 13. Contact Us
-
-If you have any questions about these Terms, please contact us at admin@monk.moe.
+For questions about these Terms, contact us at admin@monk.moe.
