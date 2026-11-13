@@ -40,8 +40,6 @@ class Tools(commands.Cog):
         try:
             await drop_user_data(ctx.author.id)
             await ctx.send(f"I have no memory of {ctx.author.mention}!")
-        except Exception as e:
-            await log.warning(f"Could not forget user: {e}")
 
 async def setup(bot):
     await bot.add_cog(Tools(bot))
