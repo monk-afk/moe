@@ -13,7 +13,7 @@ class Config:
         self.discord_prefix  = os.getenv("CMD_PREFIX") + " "
         self.discord_intents = self.get_discord_intents()
         self.reaction_emojis = self.get_reaction_emojis()
-        self.storage_key_file = os.getenv("STORAGE_KEY_FILE")
+        self.storage_key     = os.getenv("STORAGE_KEY")
 
     @staticmethod
     def get_discord_intents():

@@ -74,13 +74,8 @@ done
 python3 -m pip --no-cache-dir install -U torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
 
 #  Decryption key
-STORAGE_KEY_FILE="${MOEDIR}/storage.key"
-if [ ! -f "${STORAGE_KEY_FILE}" ]; then
-  python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())' > "${STORAGE_KEY_FILE}"
-  chmod 600 "${STORAGE_KEY_FILE}"
-fi
-if ! grep -q '^STORAGE_KEY_FILE=' "${DOTENV}"; then
-  echo "STORAGE_KEY_FILE=${STORAGE_KEY_FILE}" >> "${DOTENV}"
+if ! grep -q '^STORAGE_KEY=' "${DOTENV}"; then
+  echo "STORAGE_KEY=$(python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" >> "${DOTENV}"
 fi
 
 deactivate

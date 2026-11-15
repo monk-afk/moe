@@ -9,8 +9,7 @@ from cryptography.fernet import Fernet
 from utils.conf import config
 
 file_lock = asyncio.Lock()
-key = Path(config.storage_key_file).expanduser().read_bytes().strip()
-cipher = Fernet(key)
+cipher = Fernet(config.storage_key.encode())
 data = {}
 
 # JSON tables are string keys, we need integers
