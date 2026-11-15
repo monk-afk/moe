@@ -1,4 +1,7 @@
 #!/bin/bash
+# moe/install.sh
+# Copyright © 2026 monk <https://github.com/monk-afk>
+# SPDX-License-Identifier: MIT
 set -e
 MOEDIR=$(cd "$(dirname "${0}")" &> /dev/null && pwd)
 
@@ -61,11 +64,25 @@ fi
 source "${PYVENV}/bin/activate"
 
 # Install one at a time; sometimes batch install will cause OOM on low-resource systems
-REQUIRED_MODULES="pip wheel py-dotenv discord.py transformers torch"
+REQUIRED_MODULES="pip wheel py-dotenv discord.py transformers==4.51.3 cryptography"
 echo "Installing modules: ${REQUIRED_MODULES}"
 for MOD in ${REQUIRED_MODULES}; do
   python3 -m pip --no-cache-dir install -U "${MOD}"
 done
+
+# Need to do this one separately now
+python3 -m pip --no-cache-dir install -U torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
+
+#  Decryption key
+STORAGE_KEY_FILE="${MOEDIR}/storage.key"
+if [ ! -f "${STORAGE_KEY_FILE}" ]; then
+  python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())' > "${STORAGE_KEY_FILE}"
+  chmod 600 "${STORAGE_KEY_FILE}"
+fi
+if ! grep -q '^STORAGE_KEY_FILE=' "${DOTENV}"; then
+  echo "STORAGE_KEY_FILE=${STORAGE_KEY_FILE}" >> "${DOTENV}"
+fi
+
 deactivate
 
 # Create bot launcher script
@@ -82,28 +99,4 @@ echo "Done!
 Bot Launcher: ${RUN_SCRIPT}
 Environment Variables: ${DOTENV}
 "
-unset DOTENV PYVENV MOEDIR REQUIRED_MODULES RUN_SCRIPT
-
-######################################################################################
-##  MIT License                                                                     ##
-##                                                                                  ##
-##  Copyright © 2024-2025 monk (Discord ID: 699370563235479624)                     ##
-##                                                                                  ##
-##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
-##  of this software and associated documentation files (the "Software"), to deal   ##
-##  in the Software without restriction, including without limitation the rights    ##
-##  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       ##
-##  copies of the Software, and to permit persons to whom the Software is           ##
-##  furnished to do so, subject to the following conditions:                        ##
-##                                                                                  ##
-##  The above copyright notice and this permission notice shall be included in all  ##
-##  copies or substantial portions of the Software.                                 ##
-##                                                                                  ##
-##  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      ##
-##  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        ##
-##  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     ##
-##  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          ##
-##  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   ##
-##  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   ##
-##  SOFTWARE.                                                                       ##
-######################################################################################
+unset DOTENV PYVENV MOEDIR REQUIRED_MODULES RUN_SCRIPT STORAGE_KEY_FILE
