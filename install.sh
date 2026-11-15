@@ -75,23 +75,29 @@ python3 -m pip --no-cache-dir install -U torch==2.7.0 --index-url https://downlo
 
 #  Decryption key
 if ! grep -q '^STORAGE_KEY=' "${DOTENV}"; then
-  echo "STORAGE_KEY=$(python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" >> "${DOTENV}"
+  echo -e "\n# Storage Key\nSTORAGE_KEY=$(python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" >> "${DOTENV}"
 fi
 
 deactivate
 
 # Create bot launcher script
 RUN_SCRIPT="${MOEDIR}/run_moe.sh"
-cat <<EOF > "${RUN_SCRIPT}"
+if [ ! -f "${RUN_SCRIPT}" ]; then
+  cat <<EOF > "${RUN_SCRIPT}"
 #!/bin/bash
 source "${PYVENV}/bin/activate"
 python3 "${MOEDIR}/bot.py"
 deactivate
 EOF
-chmod 500 "${RUN_SCRIPT}"
 
-echo "Done!
-Bot Launcher: ${RUN_SCRIPT}
-Environment Variables: ${DOTENV}
-"
-unset DOTENV PYVENV MOEDIR REQUIRED_MODULES RUN_SCRIPT STORAGE_KEY_FILE
+  chmod 500 "${RUN_SCRIPT}"
+  echo "Created Launcher: ${RUN_SCRIPT}"
+else
+  echo "Launcher already exists"
+fi
+
+echo "Environment Variables: ${DOTENV}"
+
+unset DOTENV PYVENV MOEDIR REQUIRED_MODULES RUN_SCRIPT
+
+echo "Done!"
