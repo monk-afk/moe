@@ -27,14 +27,6 @@ class Tools(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(send_messages=True)
-    async def dayone(self, ctx):
-        """Show SquareOne days online."""
-        # dayone = "2023-05-28 20:01:34" CEST (19:01:34 UCT)
-        onedays = f"{(datetime.now() - datetime(2023, 5, 28, 20, 1, 34)).total_seconds() / 86400:.5f}"
-        await ctx.send(f"SquareOne is {onedays} days old.")
-
-    @commands.command()
-    @commands.has_permissions(send_messages=True)
     async def forgetme(self, ctx):
         """Erase all your chat history from møe's memory"""
         try:
