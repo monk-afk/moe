@@ -1,6 +1,6 @@
 # møe
 
-A Discord chatbot equipped with DialoGTP; a pre-trained language model tailored for casual conversation.
+A Discord chatbot powered by DialoGPT, a pre-trained language model tailored for casual conversation.
 
 <img decoding="async" loading="lazy" alt="moe banner red and white pixelated letters" src="https://raw.githubusercontent.com/monk-afk/moe/main/images/moe_banner_v3_680x240.png"  width="340"/>
 
@@ -8,17 +8,26 @@ møe's official home is at the SquareOne Discord:
 
 [![](https://dcbadge.limes.pink/api/server/pE4Tu3cf23)](https://discord.gg/pE4Tu3cf23)
 
+**[Terms of Service](Terms_of_Service.md)**
+
+**[Privacy Policy](Privacy_Policy.md)**
+
 ___
 
 ## Features
 
-- Casual Conversational AI Language Model, Powered by [DialoGPT, courtesy of Huggingface](https://huggingface.co/docs/transformers/main/en/model_doc/dialogpt) - [docs](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/text_generation#transformers.GenerationConfig)
+- Casual conversational AI powered by [Microsoft DialoGPT](https://huggingface.co/microsoft/DialoGPT-medium) through Hugging Face Transformers - [generation docs](https://huggingface.co/docs/transformers/v4.49.0/en/main_classes/text_generation#transformers.GenerationConfig)
 
-- Response triggers: "moe", "bot", "monk", "molo"
+- Response triggers: "moe", "@møe", "doot", and "bot"
 
-- Designated Reply-to Channel allows møe to reply freely with guild Members
+- Maintains a short channel context from eligible messages without generating a response until triggered
 
-- Always-reply-to enables møe to always respond to specified Users in any channel
+- Designated reply channel allows møe to respond freely in a selected channel
+
+- Replying directly to møe's message keeps a separate reply context and sends the response as a Discord reply
+
+- Recent context is limited to 12 messages or 100 model tokens and is encrypted at rest
+
 
 ___
 
@@ -31,14 +40,19 @@ ___
 - [Install Script](install.sh)
   - Requires Linux Bash
 
-- Python3 (3.8 or higher. tested with 3.11)
+- Python3 (3.9 or higher; tested with 3.11)
   - python3-venv (Python Virtual Environment)
   - python3-pip (Python Package Installer):
-    - transformers (Provides HuggingFace AI Model)
-    - torch (Message tensor encoding)
+    - transformers (Loads and runs DialoGPT)
+    - torch (Model inference)
+    - cryptography (Encrypted data storage)
     - wheel (Replaces pip-deprecated setup.py)
     - py-dotenv (Environment Variables)
     - discord.py (version 2.5.0 or higher)
+
+### Discord Configuration
+
+Enable the **Server Members Intent** and **Message Content Intent** for the application in the Discord Developer Portal.
 
 ___
 
@@ -46,65 +60,27 @@ ___
 
 The command prefix default is `m1`, as set in the .env file.
 
-> `command`(privilege): deatils of command
+> `command`(privilege): details of command
 
-- `chatlogs`(send_messages): show your conversation history
-- `forgetme`(send_messages): erase møe's memory of your conversation
-- `ping`(send_messages): test latency
 - `help`(send_messages): list all commands
 - `source`(send_messages): get the link to møe's repository
 - `squareone`(send_messages): get the invite link to møe's home Discord server
+- `ping`(send_messages): test latency
+- `time`(send_messages): show server and local time
+- `forgetme`(send_messages): erase your reply-specific conversation memory
 
-- `forgetuser @mention_member`(manage_messages): erase møe's memory of the mentioned user
-- `setreplychannel`(administrator): set or overwrite reply channel to focused channel
+- `forgetuser @mention_member`(manage_messages): erase reply-specific memory associated with the mentioned user
+- `setreplychannel`(administrator): set the current channel as the designated reply channel
 - `unsetreplychannel`(administrator): unset reply channel
-- `sayhi @mention`(administrator): set reply-to user in any channel
-- `saybye @mention`(administrator): remove reply-to user
-- `forgetguild`(administrator): erase møe's conversation memory for the entire guild
+- `ignore @mention_member`(administrator): prevent møe from processing the mentioned user's messages
+- `dontignore @mention_member`(administrator): remove the mentioned user from the ignore list
+- `forgetguild`(administrator): erase conversation memory for the guild while preserving its settings
+- `resetguild`(administrator): erase conversation memory and settings for the guild
 
-- `rebuild`(owner): rebuild the database
-- `reload [cogs name]`(owner): reload a cogs module
-- `shutdown`(owner): send the shutdown signal for graceful termination
-- `dumpbackend`(owner): dump the raw memory to debug.txt
-
-___
-
-## Troubleshoot
-
-- ToDo
+- `rebuild`(owner): erase and rebuild the encrypted data file
+- `reload [cog name]`(owner): reload a cog module
+- `shutdown`(owner): save data and gracefully stop møe
 
 ___
 
-**[Changelog](CHANGELOG.md)**
-
-**[Terms of Service](Terms_of_Service.md)**
-
-**[Privacy Policy](Privacy_Policy.md)**
-
-___
-
-```py
-######################################################################################
-##  MIT License                                                                     ##
-##                                                                                  ##
-##  Copyright © 2024-2025 monk (Discord ID: 699370563235479624)                     ##
-##                                                                                  ##
-##  Permission is hereby granted, free of charge, to any person obtaining a copy    ##
-##  of this software and associated documentation files (the "Software"), to deal   ##
-##  in the Software without restriction, including without limitation the rights    ##
-##  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell       ##
-##  copies of the Software, and to permit persons to whom the Software is           ##
-##  furnished to do so, subject to the following conditions:                        ##
-##                                                                                  ##
-##  The above copyright notice and this permission notice shall be included in all  ##
-##  copies or substantial portions of the Software.                                 ##
-##                                                                                  ##
-##  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR      ##
-##  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,        ##
-##  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE     ##
-##  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER          ##
-##  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,   ##
-##  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE   ##
-##  SOFTWARE.                                                                       ##
-######################################################################################
-```
+Copyright © 2024-2026 monk <https://github.com/monk-afk>
