@@ -29,9 +29,8 @@ class Tools(commands.Cog):
     @commands.has_permissions(send_messages=True)
     async def forgetme(self, ctx):
         """Erase all your chat history from møe's memory"""
-        try:
-            await drop_user_data(ctx.author.id)
-            await ctx.send(f"I have no memory of {ctx.author.mention}!")
+        await drop_user_data(ctx.author.id)
+        await ctx.send(f"I have no memory of {ctx.author.mention}!")
 
 async def setup(bot):
     await bot.add_cog(Tools(bot))
