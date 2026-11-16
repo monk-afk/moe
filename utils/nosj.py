@@ -57,16 +57,19 @@ async def reset_file_data():
     await save_file_data()
 
 
+# Blocked users
 async def get_ignore(user):
     return data.get(user, {}).get("ignore", False)
 
 async def set_ignore(user, value):
     if value:
+        await drop_user_data(user)
         data[user] = {"ignore": True}
     else:
         data.pop(user, None)
 
 
+# Reply channel
 async def get_reply_channel(guild):
     return data.get(guild, {}).get("reply_channel", None)
 
@@ -74,8 +77,10 @@ async def set_reply_channel(guild, value):
     if guild not in data:
         data[guild] = {"reply_channel": None, "chats": {}}
     data[guild]["reply_channel"] = value
+    await save_file_data()
 
 
+# Saving and fetching message tokens
 async def get_input_tokens(guild, user_or_channel):
     return data.get(guild, {}).get("chats", {}).get(user_or_channel, [])
 
@@ -96,6 +101,7 @@ async def drop_guild_input_tokens(guild):
     if guild in data and "chats" in data[guild]:
         for user_or_channel in list(data[guild]["chats"].keys()):
             data[guild]["chats"].pop(user_or_channel)
+        await save_file_data()
 
 # Drop tokens from one guild, or from every guild when guild is None
 async def drop_user_data(user_or_channel, guild=None):
@@ -104,3 +110,4 @@ async def drop_user_data(user_or_channel, guild=None):
     for guild_id in guilds:
         chats = data.get(guild_id, {}).get("chats", {})
         chats.pop(user_or_channel, None)
+    await save_file_data()
