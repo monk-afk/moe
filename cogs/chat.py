@@ -21,6 +21,10 @@ from utils.dialogpt import dialogpt
 
 response_triggers = {
     "moe": r".*\bm+[oø]+e+\b.*",
+    # "moe": r".*(m[oø]*e+)\1?.*",  # Broken but causes moe to reply semi-frequently
+    # "monk": r".*\bm+[oø]+n+k+\b.*",  # monk, monkkkkkk, mooonnnkk
+    # "atmonk": r".*<@699370563235479624>.*",  # @monk.moe
+
     "atmoe": r".*<@1249786267898740757>.*",  # '@mention' is received by numeric ID
     "doot": r".*\bd+o+o+t+",
     "bot": r".*\bbots?\b.*",
@@ -225,10 +229,10 @@ class Chat(commands.Cog):
 
             await set_input_tokens(message.guild.id, user_or_channel, saved_input_ids)
 
-            if user_or_channel == message.author.id:
-                await message.reply(response, mention_author=True)
-            else:
-                await message.channel.send(response)
+        if user_or_channel == message.author.id:
+            await message.reply(response, mention_author=True)
+        else:
+            await message.channel.send(response)
 
 async def setup(bot):
     await bot.add_cog(Chat(bot))
